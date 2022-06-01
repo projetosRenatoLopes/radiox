@@ -45,8 +45,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         var newLikes = []
         if (likes !== null && likes !== "" && likes !== undefined) {
             postLikes = likes.split(',')
-            newLikes = postLikes
-            console.log('não é null')
+            newLikes = postLikes            
         }
         newLikes.push(userId)
         newLikes = newLikes.join(',')
