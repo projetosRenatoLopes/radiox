@@ -67,7 +67,7 @@ const Login = () => {
                 } else if (res.status === 200) {
                     if (res.data.token !== undefined && res.data.id !== undefined) {
                         localStorage.setItem('token', res.data.token)
-                        sessionStorage.setItem('userId', res.data.id)
+                        localStorage.setItem('userId', res.data.id)
                         localStorage.setItem(`user`, res.data.name)
                         localStorage.setItem(`nickName`, res.data.nickname)
                     }

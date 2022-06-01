@@ -52,15 +52,12 @@ const Feed = () => {
     function FeedPosts() {
 
         const fedds = JSON.parse(localStorage.getItem('viewPosts'))
+        var setViewFedds;
         if (fedds !== null) {
             fedds.sort(compare)
-        }
-
-        var setViewFedds;
-        if (fedds === null) {
-            setViewFedds = []
-        } else {
             setViewFedds = fedds
+        } else{
+            setViewFedds = []
         }
 
         const [feed, setFeed] = useState(setViewFedds)
@@ -81,7 +78,7 @@ const Feed = () => {
             var youLike = false;
             if (gallery.likes !== null && gallery.likes !== undefined && gallery.likes !== '') {
                 const likes = gallery.likes.split(',')
-                const user = sessionStorage.getItem('userId')
+                const user = localStorage.getItem('userId')
                 likes.forEach(element => {
                     if (element === user) {
                         youLike = true
@@ -137,7 +134,7 @@ const Feed = () => {
                 document.getElementById('text-post')['value'] = ''
                 respostaFedd = resp.data;
                 alert.success('Post enviado.')
-                alert.info('Atualizando')
+                alert.info('Atualizando...')
                 api({
                     method: 'GET',
                     url: `/user/posts`,
@@ -164,7 +161,7 @@ const Feed = () => {
                 if (resposta.status === 500) {
                     alert.error('Erro interno.')
                 } else {
-                    alert.show(`Erro ${resposta.status} - ${resposta.message}`);
+                    alert.error(`Erro ${resposta.status} - ${resposta.message}`);
                 }
             })
 

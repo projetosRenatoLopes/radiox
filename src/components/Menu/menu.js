@@ -85,7 +85,7 @@ const Menu = () => {
         </div>
         <div className='title-page'>
             <ReactAudioPlayer id='player'
-                src="http://c13.radioboss.fm:8347/autodj"
+                src="https://c13.radioboss.fm:8347/stream"
                 controls={false}
             />
             {btnShow()}

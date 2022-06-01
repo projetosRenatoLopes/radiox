@@ -10,13 +10,14 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 
 const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
+    const [youLiked, setYouLiked] = useState(youlike)    
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(false);
     const handleClose = () => setOpen(false);
     const alert = useAlert();
-    var arrLikes;
+    var arrLikes = [];
     var arrLikesName = [];
-    if (likes !== null) {
+    if (likes !== null && likes !== "") {
         arrLikes = likes.split(',')
         var users = JSON.parse(localStorage.getItem('usersPosts'))
         arrLikes.forEach(element => {
@@ -25,12 +26,13 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                     arrLikesName.push(user.name);
             });
         });
-    } else {
-        arrLikes = []
     }
+    
+    const [namesLiked, setNamesLiked] = useState(arrLikes.length)
 
     const btnLikeShow = () => {
-        if (youlike === true) {
+        
+        if (youLiked === true) {
             return (<button className='btn-bar btn-g btn-r' onClick={removeLike} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillDislike></AiFillDislike></button>)
         } else {
             return (<button className='btn-bar btn-g btn-l' onClick={sendLike} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillLike></AiFillLike></button>)
@@ -38,20 +40,36 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
     }
 
     async function sendLike() {
+        setYouLiked(true)
+       
+       
         const token = localStorage.getItem(`token`)
-        const userId = sessionStorage.getItem('userId')
+        const userId = localStorage.getItem('userId')
 
         var postLikes;
         var newLikes = []
+        var liked = false;
         if (likes !== null && likes !== "" && likes !== undefined) {
             postLikes = likes.split(',')
-            newLikes = postLikes            
+            newLikes = postLikes
+            var user = localStorage.getItem('userId')
+            postLikes.forEach(element => {                
+                    if (element === user) {                        
+                        liked = true;
+                    }                
+            });
         }
-        newLikes.push(userId)
-        newLikes = newLikes.join(',')
 
+        if (liked === false) {
+            setNamesLiked(arrLikes.length + 1)
+            newLikes.push(userId)
+            console.log(newLikes)
+        } else {
+            setNamesLiked(arrLikes.length)
+        }
+        newLikes = newLikes.join(',')
+        console.log(newLikes)
         const dadosPost = { "id": uuid, "likes": newLikes }
-        var respostaFedd;
         await api({
             method: 'POST',
             url: `/user/like`,
@@ -61,28 +79,31 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
             },
             data: dadosPost
         }).then(resp => {
-            alert.success('LIKE - ' + post)
-            RefreshData()
-        }).catch(error => {
-            respostaFedd = error.toJSON();
-            if (respostaFedd.status === 500) {
-                alert.error('Erro interno.')
+            if (resp.status === 200) {
+                //alert.success('LIKE - ' + post)
+                RefreshData()
             } else {
-                localStorage.removeItem(`token`)
-                localStorage.removeItem('viewPosts')
-                alert.show(`Erro ${respostaFedd.status} - ${respostaFedd.message}`);
-                setTimeout(() => {
-                    const btnV = document.getElementById('login')
-                    // btnV.click()
-
-                }, 1500);
+                alert.error('ERRO AO REMOVER LIKE - ' + post)
+                setYouLiked(false)
+                setNamesLiked(arrLikesName.length)
             }
+
+        }).catch(error => {
+            setYouLiked(false)
+            setNamesLiked(arrLikesName.length)
+            alert.show(`${error.message}`);
         })
     }
 
     async function removeLike() {
+        setYouLiked(false)
+        if (arrLikesName.length > 0) {
+            setNamesLiked(arrLikesName.length - 1)
+        } else {
+            setNamesLiked(0)
+        }
         const token = localStorage.getItem(`token`)
-        const userId = sessionStorage.getItem('userId')
+        const userId = localStorage.getItem('userId')
 
         var postLikesRemove;
         var newLikesRemove = []
@@ -90,18 +111,19 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
             postLikesRemove = likes.split(',')
             //newLikes = postLikes
             postLikesRemove.forEach(element => {
-                if (element !== userId) {                    
+                if (element !== userId) {
                     newLikesRemove.push(element);
                 }
             });
 
-            if(newLikesRemove.length > 0){
+            if (newLikesRemove.length > 0) {
                 // @ts-ignore
                 newLikesRemove = newLikesRemove.join(',')
+            } else {
+                setNamesLiked(0)
             }
 
             const dadosPost = { "id": uuid, "likes": newLikesRemove }
-            var respostaFedd;
             await api({
                 method: 'POST',
                 url: `/user/like`,
@@ -111,22 +133,18 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                 },
                 data: dadosPost
             }).then(resp => {
-                alert.success('LIKE REMOVIDO - ' + post)
-                RefreshData()
-            }).catch(error => {
-                respostaFedd = error.toJSON();
-                if (respostaFedd.status === 500) {
-                    alert.error('Erro interno.')
+                if (resp.status === 200) {
+                    //alert.success('LIKE REMOVIDO - ' + post)
+                    RefreshData()
                 } else {
-                    localStorage.removeItem(`token`)
-                    localStorage.removeItem('viewPosts')
-                    alert.show(`Erro ${respostaFedd.status} - ${respostaFedd.message}`);
-                    setTimeout(() => {
-                        const btnV = document.getElementById('login')
-                        // btnV.click()
-
-                    }, 1500);
+                    alert.error('ERRO AO REMOVER LIKE - ' + post)
+                    setYouLiked(true)
+                    setNamesLiked(arrLikesName.length)
                 }
+            }).catch(error => {
+                setYouLiked(true)
+                setNamesLiked(arrLikesName.length)
+                alert.show(`${error.message}`);
             })
         }
     }
@@ -138,14 +156,14 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         ano = convDataPost.getFullYear(),
         hora = convDataPost.getHours(),
         min = convDataPost.getMinutes();
-    if (min < 10) {
-        // @ts-ignore
-        min = '0' + min
-    }
-    if (hora < 10) {
-        // @ts-ignore
-        hora = '0' + hora
-    }
+    // @ts-ignore
+    if (min < 10) { min = '0' + min }
+    // @ts-ignore
+    if (hora < 10) { hora = '0' + hora }
+    // @ts-ignore
+    if (dia < 10) { dia = '0' + dia }
+    // @ts-ignore
+    if (mes < 10) { mes = '0' + mes }
     var dataPost;
     const date = new Date();
     const hr = String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0')
@@ -172,9 +190,11 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         boxShadow: 24,
         p: 4,
     };
+
     function openModal() {
         setOpen(true)
     }
+
     return (
         <>
             <div className="card" key={uuid}>
@@ -193,7 +213,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                     </div>
                     <div style={{ 'display': 'flex', alignItems: 'center', 'margin': '0 7px 0 0' }}>
                         {btnLikeShow()}
-                        <strong onClick={openModal}>{arrLikesName.length}</strong>
+                        <strong onClick={openModal} style={{ marginLeft: '10px' }}>{namesLiked}</strong>
                     </div>
                     {/* <div id={`likes-${uuid}`} style={{ zIndex: 9999999, width: '95%',backgroundColor: '#FAFAFA', position: 'absolute', margin:'55px 0 0 15px',border:'1px solid #202020' }}>Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, </div> */}
                 </div>
@@ -216,7 +236,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                         </Typography>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                             <div style={{ 'justifyContent': 'center', 'display': 'flex' }}>
-                                Likes: {arrLikesName.length} - {arrLikesName.toString().replace(',', ', ')}
+                                Likes: {namesLiked} - {arrLikesName.toString().replace(',', ', ')}
                             </div>
                         </Typography>
                     </Box>
