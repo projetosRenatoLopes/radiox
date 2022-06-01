@@ -27,7 +27,7 @@ const Home = () => {
                 resposta = error.toJSON();
                 if (resposta.status === 500) {
                     localStorage.removeItem(`token`)
-                    alert.error('Sessão inválida! Faça login novamente.')                    
+                    alert.error('Sessão inválida! Faça login novamente.')
                 } else {
                     localStorage.removeItem(`token`)
                     alert.show(`Erro ${resposta.status} - ${resposta.message}`);
@@ -36,18 +36,20 @@ const Home = () => {
     }
 
     return (<>
-        <Fragment>           
-            <br></br>
-            <div className='logo-page'>                
+        <Fragment>            
+            <div className='logo-page'>
+                <h3>Rádio Xibungos FM</h3>
+            </div>
+            <div className="gifsbottom">
                 <img id="img-f" src='https://i.giphy.com/media/hStvd5LiWCFzYNyxR4/giphy.webp' />
             </div>
-                <img style={{width:'100%'}} id='music' src="https://i.gifer.com/origin/a0/a0fdfb0039405b9a8c222dd252be9565.gif" />              
+            <img style={{ width: '100%' }} id='music' src="https://i.gifer.com/origin/a0/a0fdfb0039405b9a8c222dd252be9565.gif" />
 
             <div className="gifsbottom">
                 <img src="https://cdn.dicionariopopular.com/imagens/numero-nove.gif?auto_optimize=low" />
                 <img src="https://cdn.dicionariopopular.com/imagens/meme-feliz.gif?auto_optimize=low" />
                 <img src='https://cdn.dicionariopopular.com/imagens/homem-dancando.gif?auto_optimize=low' />
-            </div>            
+            </div>
         </Fragment>
     </>)
 }

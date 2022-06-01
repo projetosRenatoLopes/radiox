@@ -20,8 +20,13 @@ const Feed = () => {
         }
     }).then(resp => {
         respostaFedd = resp.data;
-        localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
-        localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
+        if (respostaFedd === "") {
+            localStorage.setItem(`viewPosts`, JSON.stringify([]))
+            localStorage.setItem(`usersPosts`, JSON.stringify([])) 
+        } else {
+            localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
+            localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
+        }
     }).catch(error => {
         respostaFedd = error.toJSON();
         if (respostaFedd.status === 500) {
@@ -47,7 +52,7 @@ const Feed = () => {
     function FeedPosts() {
 
         const fedds = JSON.parse(localStorage.getItem('viewPosts'))
-        if(fedds !== null){
+        if (fedds !== null) {
             fedds.sort(compare)
         }
 
@@ -64,7 +69,7 @@ const Feed = () => {
             const interval = setInterval(() => {
                 RefreshData()
                 const fedds = JSON.parse(localStorage.getItem('viewPosts'))
-                if(fedds !== null){
+                if (fedds !== null) {
                     fedds.sort(compare)
                 }
                 setFeed(fedds)
@@ -93,7 +98,7 @@ const Feed = () => {
                         likes={gallery.likes}
                         post={gallery.post}
                         youlike={youLike}
-                        data={gallery.date}                        
+                        data={gallery.date}
                     />
                 </div>
             )
@@ -101,7 +106,7 @@ const Feed = () => {
 
 
         if (fedds === null || fedds.length === 0) {
-            return (<><div style={{ 'display': 'flex', 'justifyContent': 'center', 'width': '100%' }}><h5>Nenhum post para mostrar.</h5></div></>)
+            return (<><div style={{ 'display': 'flex', 'justifyContent': 'center', 'width': '100%', color: '#FFFFFF' }}><h5>Nada para mostrar ainda.</h5></div></>)
         } else {
             return (
                 <div className="list-prod" id='list-prod' style={{ 'width': '100%', 'fontSize': '15px' }}>
@@ -129,7 +134,7 @@ const Feed = () => {
                 },
                 data: dadosPost
             }).then(resp => {
-                document.getElementById('btnSendPost')['value'] = ''
+                document.getElementById('text-post')['value'] = ''
                 respostaFedd = resp.data;
                 alert.success('Post enviado.')
                 alert.info('Atualizando')
@@ -173,12 +178,13 @@ const Feed = () => {
 
     return (<>
         <Fragment>
-            <br></br>
-            <textarea id='text-post' style={{ margin: '50px 0 15px 0', width: '100%', height: '100px', maxWidth: '100%', maxHeight: '150px' }}></textarea>
+            <div className='logo-page'>
+                <h3>Feed</h3>
+            </div>
+            <textarea id='text-post' style={{ margin: '10px 0 15px 0', width: '100%', height: '100px', maxWidth: '100%', maxHeight: '150px' }}></textarea>
             <button className='btn-bar btn-g btn-l' id='btnSendPost' onClick={sendPost}>Postar</button>
             <br></br>
-
-            <h4>Feed:</h4>
+            <br></br>
             <FeedPosts></FeedPosts>
         </Fragment>
     </>)

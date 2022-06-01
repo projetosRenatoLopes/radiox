@@ -133,7 +133,7 @@ const User = () => {
 
                 {/* <input type='text'  placeholder="Login" style={{ 'width': '50%' }}></input>
             <input type='password' placeholder="Senha" style={{ 'width': '50%' }}></input> */}
-                <h4>Usuário: {nickName}</h4>
+                <h4 style={{color:'#FFFFFF'}}>Usuário: {nickName}</h4>
                 <InputEmail className='input-user' placeholder='Nome' defaultValue={userAdm} />
                 <div id="validation-name"></div>
                 <InputPass id='pass' className='input-pass' placeholder='Senha atual' />

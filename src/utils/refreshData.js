@@ -11,9 +11,14 @@ const RefreshData = async () => {
             Authorization: token
         }
     }).then(resp => {    
-        respostaFedd = resp.data;        
-        localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
-        localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
+        respostaFedd = resp.data;
+        if (respostaFedd === "") {
+            localStorage.setItem(`viewPosts`, JSON.stringify([]))
+            localStorage.setItem(`usersPosts`, JSON.stringify([])) 
+        } else {
+            localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
+            localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
+        }
     }).catch(error => {
         respostaFedd = error.toJSON();
         if (respostaFedd.status === 500) {

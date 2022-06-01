@@ -18,6 +18,14 @@ input[type=email] {
   text-align: left;
   width: 70%;
 }
+#validation-user {
+  margin: 8px 0 0 0;
+  font-size: 0.8rem;
+  color: rgb(255, 0, 0);
+  background-color: transparent;
+  text-align: left;
+  width: 70%;
+}
 
 .input-email {
   width: 70%;

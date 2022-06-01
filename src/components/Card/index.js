@@ -3,8 +3,16 @@ import { AiFillLike, AiFillDislike } from 'react-icons/ai'
 import api from '../../services/api';
 import { useAlert } from "react-alert";
 import RefreshData from '../../utils/refreshData';
+//modal
+import { useState } from 'react'
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 
 const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(false);
+    const handleClose = () => setOpen(false);
     const alert = useAlert();
     var arrLikes;
     var arrLikesName = [];
@@ -16,16 +24,16 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                 if (element === user.id)
                     arrLikesName.push(user.name);
             });
-        });        
+        });
     } else {
         arrLikes = []
     }
 
     const btnLikeShow = () => {
         if (youlike === true) {
-            return (<button className='btn-bar btn-g btn-r'><AiFillDislike></AiFillDislike></button>)
+            return (<button className='btn-bar btn-g btn-r' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillDislike></AiFillDislike></button>)
         } else {
-            return (<button className='btn-bar btn-g btn-l' onClick={sendLike}><AiFillLike></AiFillLike></button>)
+            return (<button className='btn-bar btn-g btn-l' onClick={sendLike} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillLike></AiFillLike></button>)
         }
     }
 
@@ -53,7 +61,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
             },
             data: dadosPost
         }).then(resp => {
-            alert.success('LIKE')
+            alert.success('LIKE - ' + post)
             RefreshData()
         }).catch(error => {
             respostaFedd = error.toJSON();
@@ -101,6 +109,20 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         dataPost = `${dia}/${mes}/${ano} - ${hora}:${min}`
     }
 
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '70%',
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+    };
+    function openModal() {
+        setOpen(true)
+    }
     return (
         <>
             <div className="card" key={uuid}>
@@ -115,18 +137,38 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                 <div className='likes' style={{ display: 'flex', justifyContent: 'space-between', margin: '0 10px 5px 0', alignItems: 'center' }}>
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <h5 className="card-title">{`${name} -`}</h5>
-                        <p>{`${userPost}`}</p>
+                        <p style={{ marginLeft: '5px' }}>{`${userPost}`}</p>
                     </div>
                     <div style={{ 'display': 'flex', alignItems: 'center', 'margin': '0 7px 0 0' }}>
                         {btnLikeShow()}
-                        <strong>{arrLikes.length}</strong>
-                        {/* <div id='likes' style={{zIndex:9999999,width:'100px',height:'50px',backgroundColor:'#202020',position:'absolute'}}></div> */}
+                        <strong onClick={openModal}>{arrLikes.length}</strong>
                     </div>
+                    {/* <div id={`likes-${uuid}`} style={{ zIndex: 9999999, width: '95%',backgroundColor: '#FAFAFA', position: 'absolute', margin:'55px 0 0 15px',border:'1px solid #202020' }}>Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, </div> */}
                 </div>
             </div>
             <br></br>
             <div>
 
+            </div >
+            <div>
+                <Modal
+
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2" style={{ 'display': 'flex', 'justifyContent': 'center' }}>
+                            <strong>{post}</strong>
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            <div style={{ 'justifyContent': 'center', 'display': 'flex' }}>
+                               Likes: {arrLikesName.length} - {arrLikesName.toString().replace(',', ', ')}
+                            </div>
+                        </Typography>
+                    </Box>
+                </Modal >
             </div >
         </>
     )
