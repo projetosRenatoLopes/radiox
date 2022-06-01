@@ -31,7 +31,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
 
     const btnLikeShow = () => {
         if (youlike === true) {
-            return (<button className='btn-bar btn-g btn-r' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillDislike></AiFillDislike></button>)
+            return (<button className='btn-bar btn-g btn-r' onClick={removeLike} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillDislike></AiFillDislike></button>)
         } else {
             return (<button className='btn-bar btn-g btn-l' onClick={sendLike} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillLike></AiFillLike></button>)
         }
@@ -43,9 +43,10 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
 
         var postLikes;
         var newLikes = []
-        if (likes !== null) {
+        if (likes !== null && likes !== "" && likes !== undefined) {
             postLikes = likes.split(',')
             newLikes = postLikes
+            console.log('não é null')
         }
         newLikes.push(userId)
         newLikes = newLikes.join(',')
@@ -79,6 +80,59 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
             }
         })
     }
+
+    async function removeLike() {
+        const token = localStorage.getItem(`token`)
+        const userId = sessionStorage.getItem('userId')
+
+        var postLikesRemove;
+        var newLikesRemove = []
+        if (likes !== null) {
+            postLikesRemove = likes.split(',')
+            //newLikes = postLikes
+            postLikesRemove.forEach(element => {
+                if (element !== userId) {                    
+                    newLikesRemove.push(element);
+                }
+            });
+
+            if(newLikesRemove.length > 0){
+                // @ts-ignore
+                newLikesRemove = newLikesRemove.join(',')
+            }
+
+            const dadosPost = { "id": uuid, "likes": newLikesRemove }
+            var respostaFedd;
+            await api({
+                method: 'POST',
+                url: `/user/like`,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: token
+                },
+                data: dadosPost
+            }).then(resp => {
+                alert.success('LIKE REMOVIDO - ' + post)
+                RefreshData()
+            }).catch(error => {
+                respostaFedd = error.toJSON();
+                if (respostaFedd.status === 500) {
+                    alert.error('Erro interno.')
+                } else {
+                    localStorage.removeItem(`token`)
+                    localStorage.removeItem('viewPosts')
+                    alert.show(`Erro ${respostaFedd.status} - ${respostaFedd.message}`);
+                    setTimeout(() => {
+                        const btnV = document.getElementById('login')
+                        // btnV.click()
+
+                    }, 1500);
+                }
+            })
+        }
+    }
+
+
     const convDataPost = new Date(parseInt(data))
     var dia = convDataPost.getDate(),
         mes = (convDataPost.getMonth() + 1),
@@ -102,7 +156,6 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         dataPost = 'Agora'
         // } else if (day === `${dia}/${mes}/${ano}`) {
         //     const teste = new Date(date - convDataPost )
-        //     console.log(teste)
         //     const elapsedTime = (parseInt(hr) - parseInt(`${hora}:${min}`))
         //     dataPost = `Há ${elapsedTime} minutos`
     } else {
@@ -141,7 +194,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                     </div>
                     <div style={{ 'display': 'flex', alignItems: 'center', 'margin': '0 7px 0 0' }}>
                         {btnLikeShow()}
-                        <strong onClick={openModal}>{arrLikes.length}</strong>
+                        <strong onClick={openModal}>{arrLikesName.length}</strong>
                     </div>
                     {/* <div id={`likes-${uuid}`} style={{ zIndex: 9999999, width: '95%',backgroundColor: '#FAFAFA', position: 'absolute', margin:'55px 0 0 15px',border:'1px solid #202020' }}>Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, </div> */}
                 </div>
@@ -164,7 +217,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                         </Typography>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                             <div style={{ 'justifyContent': 'center', 'display': 'flex' }}>
-                               Likes: {arrLikesName.length} - {arrLikesName.toString().replace(',', ', ')}
+                                Likes: {arrLikesName.length} - {arrLikesName.toString().replace(',', ', ')}
                             </div>
                         </Typography>
                     </Box>
