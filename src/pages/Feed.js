@@ -50,7 +50,6 @@ const Feed = () => {
     })
 
     function FeedPosts() {
-
         const fedds = JSON.parse(localStorage.getItem('viewPosts'))
         var setViewFedds;
         if (fedds !== null) {
@@ -59,7 +58,6 @@ const Feed = () => {
         } else{
             setViewFedds = []
         }
-
         const [feed, setFeed] = useState(setViewFedds)
 
         React.useEffect(() => {
@@ -70,9 +68,11 @@ const Feed = () => {
                     fedds.sort(compare)
                 }
                 setFeed(fedds)
-            }, 5000);
+            }, 2000);
             return () => clearInterval(interval)
         }, []);
+
+
 
         const renderCards = (gallery, key) => {
             var youLike = false;

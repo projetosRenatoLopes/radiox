@@ -697,6 +697,7 @@ input:checked+section.box-edit .box-title:before {
     border-radius: .25rem;
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out
 }
+
 .btn-r {
     border-radius: 0 8px 8px 0;
     color: #dc3545;

@@ -10,9 +10,8 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 
 const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
-    const [youLiked, setYouLiked] = useState(youlike)    
+    var youLiked = youlike
     const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(false);
     const handleClose = () => setOpen(false);
     const alert = useAlert();
     var arrLikes = [];
@@ -28,21 +27,22 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         });
     }
     
-    const [namesLiked, setNamesLiked] = useState(arrLikes.length)
+    //const [namesLiked, setNamesLiked] = useState(arrLikes.length)
 
-    const btnLikeShow = () => {
+    const btnLikeShow = () => { 
         
         if (youLiked === true) {
-            return (<button className='btn-bar btn-g btn-r' onClick={removeLike} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillDislike></AiFillDislike></button>)
+            return (<button disabled={false} id={`unlike${uuid}`} className='btn-bar btn-g btn-r' onClick={removeLike} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillDislike></AiFillDislike></button>)
         } else {
-            return (<button className='btn-bar btn-g btn-l' onClick={sendLike} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillLike></AiFillLike></button>)
+            return (<button disabled={false} id={`like${uuid}`} className='btn-bar btn-g btn-l' onClick={sendLike} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillLike></AiFillLike></button>)
         }
     }
-
+    
     async function sendLike() {
-        setYouLiked(true)
-       
-       
+        youLiked = true
+        document.getElementById(`like${uuid}`)['disabled'] = true;
+        //document.getElementById(`countLikes-${uuid}`)['value'] = actualLikes + 1
+
         const token = localStorage.getItem(`token`)
         const userId = localStorage.getItem('userId')
 
@@ -53,22 +53,18 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
             postLikes = likes.split(',')
             newLikes = postLikes
             var user = localStorage.getItem('userId')
-            postLikes.forEach(element => {                
-                    if (element === user) {                        
-                        liked = true;
-                    }                
+            postLikes.forEach(element => {
+                if (element === user) {
+                    liked = true;
+                }
             });
         }
 
         if (liked === false) {
-            setNamesLiked(arrLikes.length + 1)
             newLikes.push(userId)
-            console.log(newLikes)
-        } else {
-            setNamesLiked(arrLikes.length)
         }
+
         newLikes = newLikes.join(',')
-        console.log(newLikes)
         const dadosPost = { "id": uuid, "likes": newLikes }
         await api({
             method: 'POST',
@@ -81,27 +77,22 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         }).then(resp => {
             if (resp.status === 200) {
                 //alert.success('LIKE - ' + post)
-                RefreshData()
+                RefreshData()                
             } else {
                 alert.error('ERRO AO REMOVER LIKE - ' + post)
-                setYouLiked(false)
-                setNamesLiked(arrLikesName.length)
+                youLiked = false
             }
 
         }).catch(error => {
-            setYouLiked(false)
-            setNamesLiked(arrLikesName.length)
+            youLiked = false
             alert.show(`${error.message}`);
         })
     }
 
     async function removeLike() {
-        setYouLiked(false)
-        if (arrLikesName.length > 0) {
-            setNamesLiked(arrLikesName.length - 1)
-        } else {
-            setNamesLiked(0)
-        }
+        document.getElementById(`unlike${uuid}`)['disabled'] = true;
+        youLiked = false
+
         const token = localStorage.getItem(`token`)
         const userId = localStorage.getItem('userId')
 
@@ -119,8 +110,6 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
             if (newLikesRemove.length > 0) {
                 // @ts-ignore
                 newLikesRemove = newLikesRemove.join(',')
-            } else {
-                setNamesLiked(0)
             }
 
             const dadosPost = { "id": uuid, "likes": newLikesRemove }
@@ -138,12 +127,11 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                     RefreshData()
                 } else {
                     alert.error('ERRO AO REMOVER LIKE - ' + post)
-                    setYouLiked(true)
-                    setNamesLiked(arrLikesName.length)
+                    youLiked = true
+
                 }
             }).catch(error => {
-                setYouLiked(true)
-                setNamesLiked(arrLikesName.length)
+                youLiked = true
                 alert.show(`${error.message}`);
             })
         }
@@ -194,7 +182,23 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
     function openModal() {
         setOpen(true)
     }
-
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            var verYouLike = false;
+            if (likes !== null && likes !== undefined && likes !== '') {
+                const likesPost = likes.split(',')
+                const user = localStorage.getItem('userId')
+                likesPost.forEach(element => {
+                    if (element === user) {
+                        console.log(element +"-"+user)
+                        verYouLike = true
+                    }
+                });
+            }
+            youLiked = verYouLike;
+        }, 2000);
+        return () => clearInterval(interval)
+    }, []);
     return (
         <>
             <div className="card" key={uuid}>
@@ -213,7 +217,9 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                     </div>
                     <div style={{ 'display': 'flex', alignItems: 'center', 'margin': '0 7px 0 0' }}>
                         {btnLikeShow()}
-                        <strong onClick={openModal} style={{ marginLeft: '10px' }}>{namesLiked}</strong>
+                        <div onClick={openModal} style={{ marginLeft: '10px' }}>
+                            <p id={`countlikes${uuid}`}>{arrLikesName.length}</p>
+                        </div>
                     </div>
                     {/* <div id={`likes-${uuid}`} style={{ zIndex: 9999999, width: '95%',backgroundColor: '#FAFAFA', position: 'absolute', margin:'55px 0 0 15px',border:'1px solid #202020' }}>Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, </div> */}
                 </div>
@@ -231,12 +237,20 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                     aria-describedby="modal-modal-description"
                 >
                     <Box sx={style}>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            <div style={{ 'display': 'flex', whiteSpace: 'normal' }}>
+                                {name}
+                            </div>
+                        </Typography>
                         <Typography id="modal-modal-title" variant="h6" component="h2" style={{ 'display': 'flex', 'justifyContent': 'center' }}>
                             <strong>{post}</strong>
                         </Typography>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            <div style={{ 'justifyContent': 'center', 'display': 'flex' }}>
-                                Likes: {namesLiked} - {arrLikesName.toString().replace(',', ', ')}
+                            <div style={{ 'display': 'flex', whiteSpace: 'normal' }}>
+                                {arrLikesName.length} Likes:
+                            </div>
+                            <div style={{ 'display': 'flex', whiteSpace: 'normal' }}>
+                                {arrLikesName.toString().replace(/[,]/g, ", ")}
                             </div>
                         </Typography>
                     </Box>
