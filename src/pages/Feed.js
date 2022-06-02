@@ -116,8 +116,7 @@ const Feed = () => {
     async function sendPost() {
         document.getElementById('btnSendPost')['disabled'] = true
         const textPost = document.getElementById('text-post')['value']
-        if (textPost.length > 3) {
-            alert.info('Enviando post...')
+        if (textPost.length > 3) {            
 
             const token = localStorage.getItem(`token`)
             const dadosPost = { "post": textPost }
@@ -133,8 +132,7 @@ const Feed = () => {
             }).then(resp => {
                 document.getElementById('text-post')['value'] = ''
                 respostaFedd = resp.data;
-                alert.success('Post enviado.')
-                alert.info('Atualizando...')
+                alert.success('Post enviado.')                
                 api({
                     method: 'GET',
                     url: `/user/posts`,
@@ -142,8 +140,7 @@ const Feed = () => {
                         'Content-Type': 'application/json',
                         Authorization: token
                     }
-                }).then(resp => {
-                    alert.success('Atualizado')
+                }).then(resp => {                    
                     respostaFedd = resp.data;
                     localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
                     localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))

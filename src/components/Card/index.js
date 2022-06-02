@@ -32,9 +32,9 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
     const btnLikeShow = () => { 
         
         if (youLiked === true) {
-            return (<button disabled={false} id={`unlike${uuid}`} className='btn-bar btn-g btn-r' onClick={removeLike} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillDislike></AiFillDislike></button>)
+            return (<AiFillDislike id={`unlike${uuid}`} className='btn-bar btn-g btn-r' onClick={removeLike} ></AiFillDislike>)
         } else {
-            return (<button disabled={false} id={`like${uuid}`} className='btn-bar btn-g btn-l' onClick={sendLike} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><AiFillLike></AiFillLike></button>)
+            return (<AiFillLike id={`like${uuid}`} className='btn-bar btn-g btn-l' onClick={sendLike}></AiFillLike>)
         }
     }
     
@@ -42,30 +42,9 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         youLiked = true
         document.getElementById(`like${uuid}`)['disabled'] = true;
         //document.getElementById(`countLikes-${uuid}`)['value'] = actualLikes + 1
-
         const token = localStorage.getItem(`token`)
-        const userId = localStorage.getItem('userId')
 
-        var postLikes;
-        var newLikes = []
-        var liked = false;
-        if (likes !== null && likes !== "" && likes !== undefined) {
-            postLikes = likes.split(',')
-            newLikes = postLikes
-            var user = localStorage.getItem('userId')
-            postLikes.forEach(element => {
-                if (element === user) {
-                    liked = true;
-                }
-            });
-        }
-
-        if (liked === false) {
-            newLikes.push(userId)
-        }
-
-        newLikes = newLikes.join(',')
-        const dadosPost = { "id": uuid, "likes": newLikes }
+        const dadosPost = { "id": uuid, "action":'like' }
         await api({
             method: 'POST',
             url: `/user/like`,
@@ -92,27 +71,10 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
     async function removeLike() {
         document.getElementById(`unlike${uuid}`)['disabled'] = true;
         youLiked = false
-
         const token = localStorage.getItem(`token`)
-        const userId = localStorage.getItem('userId')
-
-        var postLikesRemove;
-        var newLikesRemove = []
         if (likes !== null) {
-            postLikesRemove = likes.split(',')
-            //newLikes = postLikes
-            postLikesRemove.forEach(element => {
-                if (element !== userId) {
-                    newLikesRemove.push(element);
-                }
-            });
 
-            if (newLikesRemove.length > 0) {
-                // @ts-ignore
-                newLikesRemove = newLikesRemove.join(',')
-            }
-
-            const dadosPost = { "id": uuid, "likes": newLikesRemove }
+            const dadosPost = { "id": uuid, "action":'unlike' }
             await api({
                 method: 'POST',
                 url: `/user/like`,
