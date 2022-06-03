@@ -45,10 +45,10 @@ const User = () => {
             document.getElementById("rep-new-pass").style.boxShadow = '0px 1px 0px 0px red';
             document.getElementById("validation-pass").innerText = ("Digite a nova senha.")
             return false;
-        } else if (pass.length < '8') {
+        } else if (pass.length < '6') {
             document.getElementById("new-pass").style.boxShadow = '0px 1px 0px 0px red';
             document.getElementById("rep-new-pass").style.boxShadow = '0px 1px 0px 0px red';
-            document.getElementById("validation-pass").innerText = ("Sua nova senha deve ter 8 dígitos ou mais.");
+            document.getElementById("validation-pass").innerText = ("Sua nova senha deve ter 6 dígitos ou mais.");
             return false;
         } else if (pass !== passTwo) {
             document.getElementById("new-pass").style.boxShadow = '0px 1px 0px 0px red';
