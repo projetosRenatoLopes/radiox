@@ -1696,10 +1696,13 @@ background-color: #fff;
 }
 
 .img-text {
-    height: 100px;
+    padding: 15px 0 10px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border: 1px solid #20202038;
+    margin-top: 5px;
+    background-color: #ffffffab;
 }
 
 .card-text {
