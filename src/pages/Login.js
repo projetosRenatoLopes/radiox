@@ -69,6 +69,7 @@ const Login = () => {
                         localStorage.setItem('userId', res.data.id)
                         localStorage.setItem(`user`, res.data.name)
                         localStorage.setItem(`nickName`, res.data.nickname)
+                        localStorage.setItem(`avatar`, res.data.avatar)
                     }
                     document.getElementById('msg')['textContent'] = res.data.name
                     document.getElementById('msg').style.color = 'green'

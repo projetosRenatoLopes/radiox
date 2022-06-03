@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^0.26.1",
     "cors": "^2.8.5",
+    "fs": "^0.0.1-security",
     "react": "^17.0.2",
     "react-alert": "^7.0.3",
     "react-alert-template-basic": "^1.0.2",
@@ -50,5 +51,10 @@
   },
   "devDependencies": {
     "msw": "^0.39.1"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
   }
 }

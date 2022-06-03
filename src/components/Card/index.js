@@ -8,18 +8,18 @@ import { useState } from 'react'
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-const noAvatar = '/img/noavatar.png';
 
 const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
+    const [avatar, setAvatar] = useState('/img/noavatar.png')
     var youLiked = youlike
     const [open, setOpen] = useState(false);
     const handleClose = () => setOpen(false);
     const alert = useAlert();
     var arrLikes = [];
     var arrLikesName = [];
+    const users = JSON.parse(localStorage.getItem('usersPosts'))
     if (likes !== null && likes !== "") {
         arrLikes = likes.split(',')
-        var users = JSON.parse(localStorage.getItem('usersPosts'))
         arrLikes.forEach(element => {
             users.forEach(user => {
                 if (element === user.id)
@@ -28,7 +28,9 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         });
     }
 
-    //const [namesLiked, setNamesLiked] = useState(arrLikes.length)
+
+
+
 
     const btnLikeShow = () => {
 
@@ -157,18 +159,24 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                     }
                 });
             }
+            users.forEach(user => {
+                if (user.nickname === userPost){                    
+                    setAvatar(user.avatar)
+                } else {
+                    setAvatar('/img/noavatar.png')
+                }
+            });
             youLiked = verYouLike;
         }, 2000);
         return () => clearInterval(interval)
     }, []);
-    var imgUser = noAvatar;
     //'#65676b'
     return (
         <>
             <div className="card" key={uuid}>
                 <div className='title' style={{ display: 'flex' }} >
-                    <div className='avatar' style={{backgroundColor:'#65676b',width: '40px', height: '40px', justifyContent: 'center', margin: '10px 0 5px 10px', borderRadius: '50%' }}>
-                        <img alt='avatar' src={imgUser} style={{width:'100%',height:'100%',borderRadius: '50%'}} ></img>
+                    <div className='avatar' style={{ backgroundColor: '#65676b', width: '40px', height: '40px', justifyContent: 'center', margin: '10px 0 5px 10px', borderRadius: '50%' }}>
+                        <img alt='avatar' src={avatar} style={{ width: '100%', height: '100%', borderRadius: '50%' }} ></img>
                     </div>
                     <div className='name-date' style={{ display: 'inline', margin: '10px 0 5px 10px', alignItems: 'center' }}>
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
