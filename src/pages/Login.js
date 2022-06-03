@@ -100,7 +100,7 @@ const Login = () => {
                 </div>
                 <h5 id='msg' style={{ 'width': 'auto', 'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center' }}> </h5>
                 <div className="field-login">                   
-                    <InputEmail defaultValue={''} className='input-user' placeholder='Usuário' />
+                    <InputEmail defaultValue={''} className='input-user' placeholder='Usuário' onChange={()=>''} />
                     <div id="validation-user"></div>
                     <InputPass id='pass' className='input-pass' placeholder='Senha' />
                     <div id="validation-pass"></div>

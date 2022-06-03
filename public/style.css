@@ -698,6 +698,47 @@ input:checked+section.box-edit .box-title:before {
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out
 }
 
+.btn-like {
+    border-radius: 0 8px 8px 0;
+    color: #606770;
+}
+.btn-like:hover {
+    background-color: #f0f2f5;
+    color: #198754;
+}
+.btn-unlike {
+    border-radius: 0 8px 8px 0;
+    color: #198754;
+}
+.btn-unlike:hover {
+    background-color: #f0f2f5;
+    color: #606770;
+}
+
+.btn-post{    
+    display: inline-block;
+    align-items: center;
+    justify-content: center;
+    font-weight: 400;
+    line-height: 1.5;    
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;    
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out
+}
+
+
+
+
 .btn-r {
     border-radius: 0 8px 8px 0;
     color: #dc3545;
@@ -1584,17 +1625,17 @@ fieldset:disabled .btn {
 
 /* Cards Fonte: Bootstrap */
 .card {
+    background: #FFFFFF;
+    border-radius: .4rem;
     position: relative;
     display: flex;
     width: auto;
     flex-direction: column;
     min-width: 0;
     word-wrap: break-word;
-    background: rgb(200 211 241 / 87%);
     backdrop-filter: blur(150px);
     --webkit-backdrop-filter: blur(10px);
     box-shadow: 0 -1px 0 #e5e5e5, 0 0 2px rgba(0, 0, 0, .12), 0 2px 4px rgba(0, 0, 0, .24);
-    border-radius: .90rem
 }
 
 .card:hover{
@@ -1695,13 +1736,12 @@ background-color: #fff;
     border-radius: calc(.25rem - 1px)
 }
 
-.img-text {
-    padding: 15px 0 10px 0;
+.post-body {
+    padding: 5px 0 10px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid #20202038;
-    margin-top: 5px;
+    border-bottom: 1px solid #20202038;    
     background-color: #ffffffab;
 }
 

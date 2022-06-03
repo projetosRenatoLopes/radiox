@@ -41,20 +41,32 @@ const User = () => {
         var pass = document.getElementById('new-pass')["value"];
         var passTwo = document.getElementById('rep-new-pass')["value"];
         if (pass === "") {
-            document.getElementById("new-pass").style.boxShadow = '0px 1px 0px 0px red';
-            document.getElementById("rep-new-pass").style.boxShadow = '0px 1px 0px 0px red';
-            document.getElementById("validation-pass").innerText = ("Digite a nova senha.")
-            return false;
+            if(passTwo === ""){
+                cleanValidNewPass();
+                return true
+            } else{
+                document.getElementById("new-pass").style.boxShadow = '0px 1px 0px 0px red';
+                document.getElementById("rep-new-pass").style.boxShadow = '0px 1px 0px 0px red';
+                document.getElementById("validation-pass").innerText = ("Digite a nova senha nos dois campos.")
+                return false
+            }           
         } else if (pass.length < '6') {
             document.getElementById("new-pass").style.boxShadow = '0px 1px 0px 0px red';
             document.getElementById("rep-new-pass").style.boxShadow = '0px 1px 0px 0px red';
             document.getElementById("validation-pass").innerText = ("Sua nova senha deve ter 6 dígitos ou mais.");
             return false;
         } else if (pass !== passTwo) {
-            document.getElementById("new-pass").style.boxShadow = '0px 1px 0px 0px red';
-            document.getElementById("rep-new-pass").style.boxShadow = '0px 1px 0px 0px red';
-            document.getElementById("validation-pass").innerText = ("Senhas não conferem.");
-            return false;
+            if(passTwo === ""){
+                document.getElementById("new-pass").style.boxShadow = '0px 1px 0px 0px red';
+                document.getElementById("rep-new-pass").style.boxShadow = '0px 1px 0px 0px red';
+                document.getElementById("validation-pass").innerText = ("Digite a nova senha nos dois campos.");
+                return false;
+            } else {
+                document.getElementById("new-pass").style.boxShadow = '0px 1px 0px 0px red';
+                document.getElementById("rep-new-pass").style.boxShadow = '0px 1px 0px 0px red';
+                document.getElementById("validation-pass").innerText = ("Senhas não conferem.");
+                return false;
+            }            
         } else {
             cleanValidNewPass();
             return true;
@@ -73,11 +85,22 @@ const User = () => {
             document.getElementById("user").style.boxShadow = '0px 1px 0px 0px red';
             document.getElementById("validation-name").innerText = ("Digite o nome.")
             return false;
+        } else if (name.length > 15) {
+            document.getElementById("user").style.boxShadow = '0px 1px 0px 0px red';
+            document.getElementById("validation-name").innerText = ("O campo Nome exedeu o tamanho limite de caracteres (15)")
+            return false;
         } else {
             cleanValidName();
             return true;
         }
     }
+
+    const maxCaracter=(idEl, sizeMax)=>{
+        var el = document.getElementById(idEl)["value"];
+        if (el.length > sizeMax) {
+            document.getElementById(idEl)["value"] = el.slice(0,sizeMax)
+        } 
+    }    
 
     const cleanValidName = () => {
         document.getElementById("user").style.boxShadow = 'none';
@@ -96,7 +119,10 @@ const User = () => {
             } else {
                 const nameEdit = document.getElementById('user')['value']
                 const passEdit = document.getElementById('pass')['value']
-                const newPassEdit = document.getElementById('new-pass')['value']
+                var newPassEdit = document.getElementById('new-pass')['value']
+                if(newPassEdit === ''){
+                    newPassEdit = passEdit;
+                }
                 const idEdit = localStorage.getItem('userId')
                 const userEdited = [{ "name": nameEdit, "pass": passEdit, "newpass": newPassEdit, "id": idEdit }]
                 var resposta;
@@ -128,7 +154,12 @@ const User = () => {
             }
         }
     }
-
+    function showMessage(){   
+        document.getElementById("validation-actual-pass").innerText = ("Insira a nova senha somente se for alterar.") 
+      }     
+     function hideMessage(){
+        document.getElementById("validation-actual-pass").innerText = ("")
+     }
     const userAdm = localStorage.getItem('user')
     const nickName = localStorage.getItem('nickName')
     return (
@@ -142,11 +173,11 @@ const User = () => {
                 {/* <input type='text'  placeholder="Login" style={{ 'width': '50%' }}></input>
             <input type='password' placeholder="Senha" style={{ 'width': '50%' }}></input> */}
                 <h4 style={{ color: '#FFFFFF' }}>Usuário: {nickName}</h4>
-                <InputEmail className='input-user' placeholder='Nome' defaultValue={userAdm} />
+                <InputEmail className='input-user' placeholder='Nome' defaultValue={userAdm} onChange={()=>maxCaracter('user','20')} />
                 <div id="validation-name"></div>
                 <InputPass id='pass' className='input-pass' placeholder='Senha atual' />
                 <div id="validation-actual-pass"></div>
-                <InputPass id='new-pass' className='input-pass' placeholder='Nova senha' />
+                <div style={{width:'100%',alignItems:'center',justifyContent:'center',display:'flex'}} onMouseOver={()=>showMessage()} onMouseOut={()=>hideMessage()}><InputPass id='new-pass' className='input-pass' placeholder='Nova senha'/></div>
                 <InputPass id='rep-new-pass' className='input-pass' placeholder='Repita a nova senha' />
                 <div id="validation-pass"></div>
                 <button type='submit' className="btn-co btn-l btn-g" style={{ 'marginTop': '15px', 'width': '150px' }} onClick={editUser}>Salvar</button>

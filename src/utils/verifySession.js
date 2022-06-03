@@ -6,10 +6,10 @@ const VerifySession = () => {
     const token = localStorage.getItem('token')
 
     if (token === "" || token === null || token === undefined) {
-        const btn = document.getElementById('login')
-        if (btn !== null){
-            btn.click()
-        }
+        // const btn = document.getElementById('login')
+        // if (btn !== null){
+        //     btn.click()
+        // }
     } else {
         var resposta;
         api({

@@ -8,6 +8,7 @@ import { useState } from 'react'
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+const noAvatar = '/img/noavatar.png';
 
 const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
     var youLiked = youlike
@@ -26,25 +27,25 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
             });
         });
     }
-    
+
     //const [namesLiked, setNamesLiked] = useState(arrLikes.length)
 
-    const btnLikeShow = () => { 
-        
+    const btnLikeShow = () => {
+
         if (youLiked === true) {
-            return (<AiFillDislike id={`unlike${uuid}`} className='btn-bar btn-g btn-r' onClick={removeLike} ></AiFillDislike>)
+            return (<div className='btn-post btn-g btn-unlike' onClick={removeLike} ><AiFillLike id={`unlike${uuid}`} ></AiFillLike> Curtir</div>)
         } else {
-            return (<AiFillLike id={`like${uuid}`} className='btn-bar btn-g btn-l' onClick={sendLike}></AiFillLike>)
+            return (<div className='btn-post btn-g btn-like' onClick={sendLike}><AiFillLike id={`like${uuid}`} ></AiFillLike> Curtir</div>)
         }
     }
-    
+
     async function sendLike() {
         youLiked = true
         document.getElementById(`like${uuid}`)['disabled'] = true;
         //document.getElementById(`countLikes-${uuid}`)['value'] = actualLikes + 1
         const token = localStorage.getItem(`token`)
 
-        const dadosPost = { "id": uuid, "action":'like' }
+        const dadosPost = { "id": uuid, "action": 'like' }
         await api({
             method: 'POST',
             url: `/user/like`,
@@ -56,7 +57,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         }).then(resp => {
             if (resp.status === 200) {
                 //alert.success('LIKE - ' + post)
-                RefreshData()                
+                RefreshData()
             } else {
                 alert.error('ERRO AO REMOVER LIKE - ' + post)
                 youLiked = false
@@ -74,7 +75,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         const token = localStorage.getItem(`token`)
         if (likes !== null) {
 
-            const dadosPost = { "id": uuid, "action":'unlike' }
+            const dadosPost = { "id": uuid, "action": 'unlike' }
             await api({
                 method: 'POST',
                 url: `/user/like`,
@@ -151,7 +152,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                 const likesPost = likes.split(',')
                 const user = localStorage.getItem('userId')
                 likesPost.forEach(element => {
-                    if (element === user) {                        
+                    if (element === user) {
                         verYouLike = true
                     }
                 });
@@ -160,29 +161,39 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
         }, 2000);
         return () => clearInterval(interval)
     }, []);
+    var imgUser = noAvatar;
+    //'#65676b'
     return (
         <>
             <div className="card" key={uuid}>
-                <div className='title' >
-                    <p style={{ margin: '5px 0 0 10px', padding: '0' }}>{dataPost}</p>
+                <div className='title' style={{ display: 'flex' }} >
+                    <div className='avatar' style={{backgroundColor:'#65676b',width: '40px', height: '40px', justifyContent: 'center', margin: '10px 0 5px 10px', borderRadius: '50%' }}>
+                        <img alt='avatar' src={imgUser} style={{width:'100%',height:'100%',borderRadius: '50%'}} ></img>
+                    </div>
+                    <div className='name-date' style={{ display: 'inline', margin: '10px 0 5px 10px', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <h5 className="user-name" style={{ fontSize: '15px', margin: '0 0 0 5px' }}>{`${name} -`}</h5>
+                            <p style={{ margin: '0 0 0 5px', }}>{`${userPost}`}</p>
+                        </div>
+                        <p style={{ margin: '5px 0 0 10px', padding: '0', fontSize: '12px', color: '#65676b' }}>{dataPost}</p>
+                    </div>
                 </div>
-                <div className="img-text">
+                <div className="post-body" style={{ margin: '0 6px 0 6px' }}>
                     <div className="card-text" style={{ 'display': 'flex', 'alignItems': 'center', 'width': '100%' }}>
                         <div style={{ 'padding': '0 5px 0 5px' }}>{post}</div>
                     </div>
                 </div>
-                <div className='likes' style={{ display: 'flex', justifyContent: 'space-between', margin: '0 10px 5px 0', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <h5 className="card-title">{`${name} -`}</h5>
-                        <p style={{ marginLeft: '5px' }}>{`${userPost}`}</p>
+                <div className='bottom-post' style={{ margin: '0 6px 0 6px' }}>
+                    <div onClick={openModal} style={{ borderBottom: ' 1px solid #20202038', display: 'flex', alignItems: 'center' }}>
+                        <div style={{ color: '#198754', margin: '0 0 0 10px' }} ><AiFillLike></AiFillLike></div>
+                        <p id={`countlikes${uuid}`} style={{ margin: '5px 0 5px 5px', color: '#65676b' }}>{arrLikesName.length}</p>
                     </div>
-                    <div style={{ 'display': 'flex', alignItems: 'center', 'margin': '0 7px 0 0' }}>
-                        {btnLikeShow()}
-                        <div onClick={openModal} style={{ marginLeft: '10px' }}>
-                            <p id={`countlikes${uuid}`}>{arrLikesName.length}</p>
+                    <div className='likes' style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 10px 5px 0', alignItems: 'center' }}>
+                        <div style={{ 'display': 'flex', alignItems: 'center', 'margin': '0 7px 0 0' }}>
+                            {btnLikeShow()}
                         </div>
+                        {/* <div id={`likes-${uuid}`} style={{ zIndex: 9999999, width: '95%',backgroundColor: '#FAFAFA', position: 'absolute', margin:'55px 0 0 15px',border:'1px solid #202020' }}>Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, </div> */}
                     </div>
-                    {/* <div id={`likes-${uuid}`} style={{ zIndex: 9999999, width: '95%',backgroundColor: '#FAFAFA', position: 'absolute', margin:'55px 0 0 15px',border:'1px solid #202020' }}>Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, </div> */}
                 </div>
             </div>
             <br></br>
