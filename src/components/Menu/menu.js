@@ -3,8 +3,11 @@ import { RiMenuLine, RiMenuUnfoldFill } from 'react-icons/ri'
 import { BsFillPlayFill, BsFillPauseBtnFill } from 'react-icons/bs'
 import ReactAudioPlayer from 'react-audio-player';
 import { useState } from 'react';
+import React from 'react';
+import api from '../../services/api';
 
 const Menu = () => {
+    const [linkRadio, setLinkRadio] = useState('https://live.geracaoradios.com/sertanejouni')
     const [btnPlayPause, setBtn] = useState('play')
     const [userAdmin, setUserAdmin] = useState(localStorage.getItem(`user`))
     const btnShow = () => {
@@ -56,7 +59,8 @@ const Menu = () => {
         localStorage.removeItem(`user`)
         localStorage.removeItem(`viewPosts`)
         localStorage.removeItem(`token`)
-        sessionStorage.removeItem('userId')
+        localStorage.removeItem('userId')
+        localStorage.removeItem('usersPosts')
         setUserAdmin(localStorage.getItem(`user`))
         const btnV = document.getElementById('login')
         btnV.click()
@@ -76,7 +80,37 @@ const Menu = () => {
             menu.style.display = 'none';
         }
     }
-    
+    var link;
+    api({
+        method: 'GET',
+        url: `/user/link`,
+        headers: {
+            'Content-Type': 'application/json'            
+        }
+    }).then(resp => {
+        link = resp.data;
+        if (link === "") {
+           setLinkRadio('https://live.geracaoradios.com/sertanejouni')
+        } else {
+            setLinkRadio(link)
+        }
+    }).catch(error => {
+        link = error.toJSON();
+        if (link.status === 401) {
+            setLinkRadio('https://live.geracaoradios.com/sertanejouni')      
+        } else {
+            setLinkRadio('https://live.geracaoradios.com/sertanejouni') 
+        }
+    })
+
+    React.useEffect(() => {
+        const interval = setInterval(() => {           
+            const user = localStorage.getItem('user')
+            setUserAdmin(user)
+        }, 5000);
+        return () => clearInterval(interval)
+    }, []);
+
     return (<>
         <div id='menu' className='menu' style={{ 'display': 'none' }}>
             <div className='itens-menu'>
@@ -85,7 +119,7 @@ const Menu = () => {
         </div>
         <div className='title-page'>
             <ReactAudioPlayer id='player'
-                src="https://c13.radioboss.fm:8347/stream"
+                src={linkRadio}
                 controls={false}
             />
             {btnShow()}

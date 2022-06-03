@@ -4,9 +4,11 @@ import React, { Fragment, useState } from "react";
 import Card from "../components/Card";
 import RefreshData from "../utils/refreshData";
 import { compare } from "../utils/orderById";
+import VerifySession from "../utils/verifySession";
 
 
 const Feed = () => {
+    VerifySession()
     const alert = useAlert();
     const token = localStorage.getItem(`token`)
 
@@ -22,42 +24,40 @@ const Feed = () => {
         respostaFedd = resp.data;
         if (respostaFedd === "") {
             localStorage.setItem(`viewPosts`, JSON.stringify([]))
-            localStorage.setItem(`usersPosts`, JSON.stringify([])) 
+            localStorage.setItem(`usersPosts`, JSON.stringify([]))
         } else {
             localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
             localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
         }
     }).catch(error => {
         respostaFedd = error.toJSON();
-        if (respostaFedd.status === 500) {
+        if (respostaFedd.status === 401) {
             localStorage.removeItem(`token`)
+            localStorage.removeItem(`user`)
+            localStorage.removeItem(`usersPosts`)
+            localStorage.removeItem(`userId`)
+            localStorage.removeItem(`nickName`)
             localStorage.removeItem('viewPosts')
             alert.error('Sessão inválida! Faça login novamente.')
-            setTimeout(() => {
-                const btnV = document.getElementById('login')
-                btnV.click()
-            }, 1500);
+            const btnV = document.getElementById('login')
+            btnV.click()            
         } else {
-            localStorage.removeItem(`token`)
-            localStorage.removeItem('viewPosts')
             alert.show(`Erro ${respostaFedd.status} - ${respostaFedd.message}`);
-            setTimeout(() => {
-                const btnV = document.getElementById('login')
-                btnV.click()
-
-            }, 1500);
         }
     })
 
-    function FeedPosts() {
+    function FeedPosts() {        
+
         const fedds = JSON.parse(localStorage.getItem('viewPosts'))
+
         var setViewFedds;
         if (fedds !== null) {
             fedds.sort(compare)
             setViewFedds = fedds
-        } else{
+        } else {
             setViewFedds = []
         }
+
         const [feed, setFeed] = useState(setViewFedds)
 
         React.useEffect(() => {
@@ -71,8 +71,6 @@ const Feed = () => {
             }, 2000);
             return () => clearInterval(interval)
         }, []);
-
-
 
         const renderCards = (gallery, key) => {
             var youLike = false;
@@ -116,7 +114,7 @@ const Feed = () => {
     async function sendPost() {
         document.getElementById('btnSendPost')['disabled'] = true
         const textPost = document.getElementById('text-post')['value']
-        if (textPost.length > 3) {            
+        if (textPost.length > 3) {
 
             const token = localStorage.getItem(`token`)
             const dadosPost = { "post": textPost }
@@ -132,7 +130,7 @@ const Feed = () => {
             }).then(resp => {
                 document.getElementById('text-post')['value'] = ''
                 respostaFedd = resp.data;
-                alert.success('Post enviado.')                
+                alert.success('Post enviado.')
                 api({
                     method: 'GET',
                     url: `/user/posts`,
@@ -140,7 +138,7 @@ const Feed = () => {
                         'Content-Type': 'application/json',
                         Authorization: token
                     }
-                }).then(resp => {                    
+                }).then(resp => {
                     respostaFedd = resp.data;
                     localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
                     localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))

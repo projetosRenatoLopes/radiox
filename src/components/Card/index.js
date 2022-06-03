@@ -151,8 +151,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                 const likesPost = likes.split(',')
                 const user = localStorage.getItem('userId')
                 likesPost.forEach(element => {
-                    if (element === user) {
-                        console.log(element +"-"+user)
+                    if (element === user) {                        
                         verYouLike = true
                     }
                 });

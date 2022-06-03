@@ -2,7 +2,6 @@ import api from "../services/api"
 import InputEmail from "../components/InputEmail";
 import InputPass from "../components/InputPass";
 import { useState } from "react";
-import { svgIconClasses } from "@mui/material";
 
 const Login = () => {
     const [screen, setScreen] = useState('load')

@@ -1,6 +1,6 @@
 import api from '../../src/services/api';
 
-const RefreshData = async () => {     
+const RefreshData = async () => {
     const token = localStorage.getItem(`token`)
     var respostaFedd;
     api({
@@ -10,31 +10,34 @@ const RefreshData = async () => {
             'Content-Type': 'application/json',
             Authorization: token
         }
-    }).then(resp => {    
+    }).then(resp => {
         respostaFedd = resp.data;
         if (respostaFedd === "") {
             localStorage.setItem(`viewPosts`, JSON.stringify([]))
-            localStorage.setItem(`usersPosts`, JSON.stringify([])) 
+            localStorage.setItem(`usersPosts`, JSON.stringify([]))
         } else {
             localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
             localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
         }
     }).catch(error => {
+        console.log(error)
         respostaFedd = error.toJSON();
-        if (respostaFedd.status === 500) {
+        if (respostaFedd.status === 401) {
             localStorage.removeItem(`token`)
-            localStorage.removeItem('viewPosts')            
-            setTimeout(() => {
-                const btnV = document.getElementById('login')                
-                btnV.click()
-            }, 1500);
+            localStorage.removeItem(`user`)
+            localStorage.removeItem(`usersPosts`)
+            localStorage.removeItem(`userId`)
+            localStorage.removeItem(`nickName`)
+            localStorage.removeItem('viewPosts')
+            const btnV = document.getElementById('login')
+            btnV.click()
         } else {
+            console.log(error)
             localStorage.removeItem(`token`)
-            localStorage.removeItem('viewPosts')            
+            localStorage.removeItem('viewPosts')
             setTimeout(() => {
-                const btnV = document.getElementById('login')                
+                const btnV = document.getElementById('login')
                 btnV.click()
-
             }, 1500);
         }
     })

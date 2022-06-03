@@ -3,18 +3,21 @@ import InputPass from "../components/InputPass";
 import api from "../services/api";
 import { useAlert } from "react-alert";
 import React, { Fragment } from "react";
+import VerifySession from "../utils/verifySession";
 
 
 const User = () => {
     const alert = useAlert();
-    const userAdmin = sessionStorage.getItem('userAdmin')
-    const companyTag = sessionStorage.getItem('tag')
-    var user;
-    if (userAdmin === undefined) {
-        user = 'Login'
-    } else {
-        user = userAdmin
-    }
+    VerifySession()
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            const token = localStorage.getItem('token')
+            if (token === "" || token === null || token === undefined) {
+                document.getElementById('login').click()
+            }
+        }, 2000);
+        return () => clearInterval(interval)
+    }, []);
 
     const validPass = () => {
         var pass = document.getElementById('pass')["value"];
@@ -28,10 +31,12 @@ const User = () => {
             return true;
         }
     }
+
     const cleanValidPass = () => {
         document.getElementById("pass").style.boxShadow = 'none';
         document.getElementById("validation-actual-pass").innerText = ("")
     }
+
     const validNewPass = () => {
         var pass = document.getElementById('new-pass')["value"];
         var passTwo = document.getElementById('rep-new-pass')["value"];
@@ -55,6 +60,7 @@ const User = () => {
             return true;
         }
     }
+
     const cleanValidNewPass = () => {
         document.getElementById("new-pass").style.boxShadow = 'none';
         document.getElementById("rep-new-pass").style.boxShadow = 'none';
@@ -63,7 +69,7 @@ const User = () => {
 
     const validName = () => {
         var name = document.getElementById('user')["value"];
-        if (name === "") {            
+        if (name === "") {
             document.getElementById("user").style.boxShadow = '0px 1px 0px 0px red';
             document.getElementById("validation-name").innerText = ("Digite o nome.")
             return false;
@@ -72,6 +78,7 @@ const User = () => {
             return true;
         }
     }
+
     const cleanValidName = () => {
         document.getElementById("user").style.boxShadow = 'none';
         document.getElementById("validation-name").innerText = ("")
@@ -82,7 +89,7 @@ const User = () => {
         validPass();
         validNewPass();
         if (validPass() === true && validNewPass() === true && validName() === true) {
-            const id = localStorage.getItem('nickName')            
+            const id = localStorage.getItem('nickName')
             const token = localStorage.getItem(`token`)
             if (id === null || id === "") {
                 alert.show('Erro ao enviar informações!\nFeche a página e abra novamente novamente.')
@@ -90,7 +97,7 @@ const User = () => {
                 const nameEdit = document.getElementById('user')['value']
                 const passEdit = document.getElementById('pass')['value']
                 const newPassEdit = document.getElementById('new-pass')['value']
-                const idEdit = sessionStorage.getItem('userId')                
+                const idEdit = localStorage.getItem('userId')
                 const userEdited = [{ "name": nameEdit, "pass": passEdit, "newpass": newPassEdit, "id": idEdit }]
                 var resposta;
                 await api({
@@ -103,28 +110,29 @@ const User = () => {
                     data: userEdited
                 })
                     .then(async resp => {
-                       
+
                         resposta = resp.data;
 
-                        localStorage.setItem(`${companyTag}-user`, resposta.user)
+                        localStorage.setItem('user', resposta.user)
                         alert.success('Alterações salvas com sucesso')
                         const btnV = document.getElementById('feed')
-                        btnV.click()                        
+                        btnV.click()
                     }).catch(error => {
-                        resposta = error.toJSON();                       
+                        resposta = error.toJSON();
                         if (resposta.status === 404) {
                             alert.error('Erro 404 - Requisição invalida')
                         } else if (resposta.status === 401) {
                             alert.error('A senha atual está incorreta.')
-                        } else {  alert.show(`Erro ${resposta.status} - ${resposta.message}`) }
+                        } else { alert.show(`Erro ${resposta.status} - ${resposta.message}`) }
                     })
             }
         }
     }
+
     const userAdm = localStorage.getItem('user')
     const nickName = localStorage.getItem('nickName')
     return (
-        <>            
+        <>
             <div className='logo-page'>
                 <h3>Alterar usuário</h3>
             </div>
@@ -133,7 +141,7 @@ const User = () => {
 
                 {/* <input type='text'  placeholder="Login" style={{ 'width': '50%' }}></input>
             <input type='password' placeholder="Senha" style={{ 'width': '50%' }}></input> */}
-                <h4 style={{color:'#FFFFFF'}}>Usuário: {nickName}</h4>
+                <h4 style={{ color: '#FFFFFF' }}>Usuário: {nickName}</h4>
                 <InputEmail className='input-user' placeholder='Nome' defaultValue={userAdm} />
                 <div id="validation-name"></div>
                 <InputPass id='pass' className='input-pass' placeholder='Senha atual' />
