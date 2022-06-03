@@ -176,7 +176,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
             <div className="card" key={uuid}>
                 <div className='title' style={{ display: 'flex' }} >
                     <div className='avatar' style={{ backgroundColor: '#65676b', width: '40px', height: '40px', justifyContent: 'center', margin: '10px 0 5px 10px', borderRadius: '50%' }}>
-                        <img alt='avatar' src={avatar} style={{ width: '100%', height: '100%', borderRadius: '50%' }} ></img>
+                        <img alt='img' src={avatar} style={{ width: '100%', height: '100%', borderRadius: '50%' }} ></img>
                     </div>
                     <div className='name-date' style={{ display: 'inline', margin: '10px 0 5px 10px', alignItems: 'center' }}>
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
