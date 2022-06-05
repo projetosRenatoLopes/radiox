@@ -61,6 +61,8 @@ const Menu = () => {
         localStorage.removeItem(`token`)
         localStorage.removeItem('userId')
         localStorage.removeItem('usersPosts')
+        localStorage.removeItem('imgUpload')
+        localStorage.removeItem('avatar')
         setUserAdmin(localStorage.getItem(`user`))
         const btnV = document.getElementById('login')
         btnV.click()

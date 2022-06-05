@@ -4,13 +4,11 @@ import api from "../services/api";
 import { useAlert } from "react-alert";
 import React, { Fragment, useState } from "react";
 import VerifySession from "../utils/verifySession";
-import { base64_encode } from "../utils/convertImage";
-
 
 const User = () => {
     const avatarUser = localStorage.getItem('avatar')
-    var imgDefault = '/img/noavatar.peg';
-    if(avatarUser !== null && avatarUser !== undefined && avatarUser !== ""){
+    var imgDefault = '/img/noavatar.png';
+    if (avatarUser !== null && avatarUser !== undefined && avatarUser !== "" && avatarUser !== "null") {
         imgDefault = avatarUser
     }
     const [imgUser, setImgUser] = useState(imgDefault)
@@ -170,10 +168,11 @@ const User = () => {
         if (token === null || token === "") {
             alert.show('Erro ao enviar informações!\nFeche a página e abra novamente novamente.')
         } else {
-            const imgUser = localStorage.getItem('imgUpload')
+            const imgUserEdit = localStorage.getItem('imgUpload')
             if (imgUser === null || imgUser === "" || imgUser === undefined) {
                 alert.show('Erro ao carregar a imagem! Tente selecionar o arquivo novamente.')
             } else {
+
                 const userEdited = [{ avatar: imgUser }]
                 var resposta;
                 await api({
@@ -188,7 +187,8 @@ const User = () => {
                     .then(async resp => {
                         resposta = resp.data;
                         alert.success('Alterações salvas com sucesso')
-                        localStorage.setItem(`avatar`, imgUser)                        
+                        localStorage.setItem(`avatar`, imgUser)
+                        localStorage.removeItem('imgUpload')
                     }).catch(error => {
                         resposta = error.toJSON();
                         if (resposta.status === 404) {
@@ -226,6 +226,7 @@ const User = () => {
             // let fileContent = base64_encode(fileName)
             // console.log(fileContent)
         } else {
+            localStorage.removeItem('imgUpload')
             document.getElementById("imgPerfil")['value'] = ""
             alert.error("Selecione uma imagem no formato: jpg/jpeg ou png!");
         }
@@ -249,31 +250,45 @@ const User = () => {
 
     const userAdm = localStorage.getItem('user')
     const nickName = localStorage.getItem('nickName')
+    function showBtnEdit() {
+        const elementToHover = document.getElementById('btn-editimg')
+        elementToHover.style.display = 'flex'
+    }
+    function ocultBtnEdit() {
+        const elementToHover = document.getElementById('btn-editimg')
+        elementToHover.style.display = 'none'
+    }
     return (
         <>
             <div className='logo-page'>
-                <h3>Alterar usuário</h3>
+                <h3>{userAdm}</h3>
             </div>
-            <h5 id='msg' style={{ 'width': 'auto', 'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center' }}> </h5>
-            <div className="field-login">
-
-                {/* <input type='text'  placeholder="Login" style={{ 'width': '50%' }}></input>
-            <input type='password' placeholder="Senha" style={{ 'width': '50%' }}></input> */}
-                <div className='avatar' style={{ backgroundColor: '#65676b', width: '80px', height: '80px', justifyContent: 'center', margin: '10px 0 0px 10px', borderRadius: '50%' }}>
-                    <img alt='avatar' src={imgUser} style={{ width: '100%', height: '100%', borderRadius: '50%' }} ></img>
+            <div className='profileUser' style={{ backgroundColor: '#65676b', width: '100%' }}>
+                <div className="top-profile" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <div className="img-nickname" style={{ display: 'inline', justifyContent: 'center', alignItems: 'center' }}>
+                        <h4 style={{ color: '#FFFFFF', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>{nickName}</h4>
+                        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <div id='avatar-user' onMouseOver={showBtnEdit} onMouseOut={ocultBtnEdit} className='avatar' style={{ backgroundImage: `url(${imgUser})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', width: '100px', height: '100px', justifyContent: 'center', alignItems: 'center', display: 'flex', borderRadius: '50%', margin: '10px 10px 10px 10px' }}>
+                                <label htmlFor="imgPerfil" id='btn-editimg' style={{ width: '100%', height: '100%', margin: '0 0px 0px 0px', borderRadius: '50px', display: 'none', justifyContent: 'center', alignItems: 'center', color: "#FFFFFF", backgroundColor: 'rgb(32 32 32 / 79%)', fontSize: '11px' }}>Alterar imagem</label>
+                            </div>
+                        </div>
+                        <button type='submit' className="btn-co btn-l btn-g" style={{ 'marginBottom': '15px', 'width': '150px' }} onClick={editImg}>Salvar</button>
+                    </div>
                 </div>
-                <h4 style={{ color: '#FFFFFF' }}>{nickName}</h4>
-                <input className="btn-bar" id='imgPerfil' type='file' alt="img-perfil" accept="image/jpg, image/jpeg, image/png" onChange={(e) => validateFileType(e)} style={{ width: '40%', margin: '0 0 15px 0' }}></input>
-                <button type='submit' className="btn-co btn-l btn-g" style={{ 'marginBottom': '15px', 'width': '150px' }} onClick={editImg}>Alterar Imagem</button>
-
-                <InputEmail className='input-user' placeholder='Nome' defaultValue={userAdm} onChange={() => maxCaracter('user', '20')} />
-                <div id="validation-name"></div>
-                <InputPass id='pass' className='input-pass' placeholder='Senha atual' />
-                <div id="validation-actual-pass"></div>
-                <div style={{ width: '100%', alignItems: 'center', justifyContent: 'center', display: 'flex' }} onMouseOver={() => showMessage()} onMouseOut={() => hideMessage()}><InputPass id='new-pass' className='input-pass' placeholder='Nova senha' /></div>
-                <InputPass id='rep-new-pass' className='input-pass' placeholder='Repita a nova senha' />
-                <div id="validation-pass"></div>
-                <button type='submit' className="btn-co btn-l btn-g" style={{ 'marginTop': '15px', 'width': '150px' }} onClick={editUser}>Salvar</button>
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+                    <input id='imgPerfil' type='file' alt="img-perfil" accept="image/jpg, image/jpeg, image/png" onChange={(e) => validateFileType(e)} style={{ display: 'none' }}></input>
+                </div>
+                <div className="field-login">
+                    <InputEmail className='input-user' placeholder='Nome' defaultValue={userAdm} onChange={() => maxCaracter('user', '20')} />
+                    <div id="validation-name"></div>
+                    <InputPass id='pass' className='input-pass' placeholder='Senha atual' />
+                    <div id="validation-actual-pass"></div>
+                    <div style={{ width: '100%', alignItems: 'center', justifyContent: 'center', display: 'flex' }} onMouseOver={() => showMessage()} onMouseOut={() => hideMessage()}><InputPass id='new-pass' className='input-pass' placeholder='Nova senha' /></div>
+                    <InputPass id='rep-new-pass' className='input-pass' placeholder='Repita a nova senha' />
+                    <div id="validation-pass"></div>
+                    <button type='submit' className="btn-co btn-l btn-g" style={{ 'marginTop': '15px', 'width': '150px' }} onClick={editUser}>Salvar</button>
+                </div>
+                <br></br>
             </div>
         </>
     )

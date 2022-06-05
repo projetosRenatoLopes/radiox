@@ -18,11 +18,16 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
         avatarUser = avatarUserTemp;
     }
     var strCommentsCount = '0 comentário'
-    if (comments.length < 2) {
-        strCommentsCount = `${comments.length} comentário`
+    if(comments === undefined || comments === null || comments === 'null' || comments === ""){
+        strCommentsCount = `0 comentário`
     } else {
-        strCommentsCount = `${comments.length} comentários`
+        if (comments.length < 2) {
+            strCommentsCount = `${comments.length} comentário`
+        } else {
+            strCommentsCount = `${comments.length} comentários`
+        }
     }
+    
     if (comments !== commentsActualPost) {
         setCommentsActualPost(comments)
     }
