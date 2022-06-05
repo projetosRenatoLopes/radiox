@@ -16,7 +16,7 @@ const RefreshData = async () => {
             localStorage.setItem(`viewPosts`, JSON.stringify([]))
             localStorage.setItem(`usersPosts`, JSON.stringify([]))
         } else {
-            localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
+            localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts))
             localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
         }
     }).catch(error => {
@@ -33,12 +33,6 @@ const RefreshData = async () => {
             btnV.click()
         } else {
             console.log(error)
-            localStorage.removeItem(`token`)
-            localStorage.removeItem('viewPosts')
-            setTimeout(() => {
-                const btnV = document.getElementById('login')
-                btnV.click()
-            }, 1500);
         }
     })
 

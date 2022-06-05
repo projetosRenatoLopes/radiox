@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { AiFillLike, AiFillDislike } from 'react-icons/ai'
+import { AiFillLike } from 'react-icons/ai'
+import { FaRegCommentAlt } from 'react-icons/fa'
 import api from '../../services/api';
 import { useAlert } from "react-alert";
 import RefreshData from '../../utils/refreshData';
@@ -9,7 +10,22 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 
-const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
+const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, comments }) => {
+    const [commentsActualPost, setCommentsActualPost] = useState(comments)
+    const avatarUserTemp = localStorage.getItem('avatar')
+    var avatarUser = '/img/noavatar.png';
+    if (avatarUserTemp !== null && avatarUserTemp !== undefined && avatarUserTemp !== 'null') {
+        avatarUser = avatarUserTemp;
+    }
+    var strCommentsCount = '0 comentário'
+    if (comments.length < 2) {
+        strCommentsCount = `${comments.length} comentário`
+    } else {
+        strCommentsCount = `${comments.length} comentários`
+    }
+    if (comments !== commentsActualPost) {
+        setCommentsActualPost(comments)
+    }
     const [avatar, setAvatar] = useState('/img/noavatar.png')
     var youLiked = youlike
     const [open, setOpen] = useState(false);
@@ -27,10 +43,6 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
             });
         });
     }
-
-
-
-
 
     const btnLikeShow = () => {
 
@@ -147,6 +159,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
     function openModal() {
         setOpen(true)
     }
+
     React.useEffect(() => {
         const interval = setInterval(() => {
             var verYouLike = false;
@@ -159,18 +172,116 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                     }
                 });
             }
-            users.forEach(user => {
-                if (user.nickname === userPost){                    
-                    setAvatar(user.avatar)
-                } else {
-                    setAvatar('/img/noavatar.png')
-                }
-            });
+            if (photoUser !== null) {
+                setAvatar(photoUser)
+            } else {
+                setAvatar('/img/noavatar.png')
+            }
+            setCommentsActualPost(comments)
             youLiked = verYouLike;
         }, 2000);
         return () => clearInterval(interval)
     }, []);
-    //'#65676b'
+
+    function ocultComments() {
+        document.getElementById(`commets-post-${uuid}}`).style.display = 'none'
+    }
+    function showComments() {
+        const commetsForm = document.getElementById(`commets-post-${uuid}}`).style.display
+        if (commetsForm === 'inline') {
+            document.getElementById(`commets-post-${uuid}}`).style.display = 'none'
+        } else {
+            document.getElementById(`commets-post-${uuid}}`).style.display = 'inline'
+        }
+    }
+
+    function RenderComments() {
+
+        const renderComments = (gallery, key) => {
+            var avatarComment = '/img/noavatar.png';
+            if (gallery.avatar === null || gallery.avatar === undefined || gallery.avatar === "") {
+                avatarComment = '/img/noavatar.png'
+            } else {
+                avatarComment = gallery.avatar
+            }
+
+            return (
+                <div key={gallery.id} className='comment' style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', margin: '8px 0 8px 0', width: '100%' }}>
+                    <div className='avatar' style={{ backgroundColor: '#65676b', width: '40px', height: '40px', justifyContent: 'center', borderRadius: '50%', minWidth: '40px', minHeight: '40px' }}>
+                        <img alt='img' src={avatarComment} style={{ width: '100%', height: '100%', borderRadius: '50%' }} ></img>
+                    </div>
+                    <div className="input-comment" style={{ display: 'inline', backgroundColor: 'rgb(240 242 245)', borderRadius: '30px', justifyContent: 'flex-start', alignItems: 'center', padding: '0 10px 0 10px', minHeight: '40px', margin: '0 0 0 8px' }}>
+                        <p style={{ margin: '8px 8px 2px 8px', fontSize: '12px', fontStyle: 'unset' }}>{gallery.name}</p>
+                        <p style={{ margin: '0 8px 8px 8px' }}>{gallery.comment}</p>
+                    </div>
+                </div>            
+            )
+        }
+
+        if (commentsActualPost === null || commentsActualPost.length === 0) {
+            return (<><div style={{ 'display': 'flex', 'justifyContent': 'center', 'width': '100%', color: '#FFFFFF' }}><h5>Nenhum comentário ainda.</h5></div></>)
+        } else {
+            return (
+                <div className="list-prod" id='list-prod' style={{ 'width': '100%', 'fontSize': '15px' }}>
+                    {commentsActualPost.map(renderComments)}
+                </div>
+            )
+        }
+    }
+
+    const sendComment = async (e) => {
+        if (e.key === 'Enter') {
+            const textComment = document.getElementById(`comment-text-${uuid}`)['value']
+            if (textComment === "") {
+                alert.info('Comentário vazio.')
+            } else {
+                const token = localStorage.getItem(`token`)
+                const dadosPost = { "idpost": uuid, "comment": textComment }
+                var respostaComment;
+                await api({
+                    method: 'POST',
+                    url: `/user/comment`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: token
+                    },
+                    data: dadosPost
+                }).then(resp => {
+                    document.getElementById('text-post')['value'] = ''
+                    respostaComment = resp.data;
+                    document.getElementById(`comment-text-${uuid}`)['value'] = ""
+                    alert.success('Comentário enviado.')
+                    api({
+                        method: 'GET',
+                        url: `/user/posts`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: token
+                        }
+                    }).then(resp => {
+                        respostaComment = resp.data;
+                        localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts))
+                        localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
+                    }).catch(error => {
+                        respostaComment = error.toJSON();
+                        if (respostaComment.status === 500) {
+                            alert.error('Sessão inválida! Faça login novamente.')
+                        } else {
+                            alert.show(`Erro ${respostaComment.status} - ${respostaComment.message}`);
+                        }
+                    })
+                }).catch(error => {
+                    respostaComment = error.toJSON();
+                    if (respostaComment.status === 500) {
+                        alert.error('Erro interno.')
+                    } else {
+                        alert.error(`Erro ${respostaComment.status} - ${respostaComment.message}`);
+                    }
+                })
+            }
+        }
+    }
+
     return (
         <>
             <div className="card" key={uuid}>
@@ -192,15 +303,37 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                     </div>
                 </div>
                 <div className='bottom-post' style={{ margin: '0 6px 0 6px' }}>
-                    <div onClick={openModal} style={{ borderBottom: ' 1px solid #20202038', display: 'flex', alignItems: 'center' }}>
-                        <div style={{ color: '#198754', margin: '0 0 0 10px' }} ><AiFillLike></AiFillLike></div>
-                        <p id={`countlikes${uuid}`} style={{ margin: '5px 0 5px 5px', color: '#65676b' }}>{arrLikesName.length}</p>
+                    <div style={{ borderBottom: ' 1px solid #20202038', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} onClick={openModal} >
+                            <div style={{ color: '#198754', margin: '0 0 0 10px' }} ><AiFillLike></AiFillLike></div>
+                            <p id={`countlikes${uuid}`} style={{ margin: '5px 0 5px 5px', color: '#65676b' }}>{arrLikesName.length}</p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} onClick={() => showComments()}>
+                            <p style={{ color: '#65676b', margin: '0 10px 0 0' }}>{strCommentsCount}</p>
+                        </div>
                     </div>
-                    <div className='likes' style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 10px 5px 0', alignItems: 'center' }}>
+                    <div className='likes' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #20202038' }}>
                         <div style={{ 'display': 'flex', alignItems: 'center', 'margin': '0 7px 0 0' }}>
                             {btnLikeShow()}
                         </div>
-                        {/* <div id={`likes-${uuid}`} style={{ zIndex: 9999999, width: '95%',backgroundColor: '#FAFAFA', position: 'absolute', margin:'55px 0 0 15px',border:'1px solid #202020' }}>Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, Renato Lopes, Joao Victor, </div> */}
+                        <div style={{ 'display': 'flex', alignItems: 'center', 'margin': '0 7px 0 0' }}>
+                            <div className='btn-post btn-g btn-like' onClick={() => showComments()}><FaRegCommentAlt id={`comment${uuid}`} style={{ alignItems: 'center', justifyContent: 'center' }}></FaRegCommentAlt> Comentar</div>
+                        </div>
+                    </div>
+                    <div className='space-comment' id={`commets-post-${uuid}}`} style={{ borderTop: '1px solid #20202038', display: 'none' }}>
+                        <div className='comment' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '8px 0 8px 0', width: '100%' }}>
+                            <div className='avatar' style={{ backgroundColor: '#65676b', width: '40px', height: '40px', justifyContent: 'center', borderRadius: '50%', minWidth: '40px', minHeight: '40px' }}>
+                                <img alt='img' src={avatarUser} style={{ width: '100%', height: '100%', borderRadius: '50%' }} ></img>
+                            </div>
+                            <div className="input-comment" style={{ backgroundColor: 'rgb(240 242 245)', borderRadius: '30px', justifyContent: 'flex-start', alignItems: 'center', display: 'flex', padding: '0 0 0 10px', height: '40px', width: '100%', margin: '0 0 0 8px' }}>
+                                <input type="text" id={`comment-text-${uuid}`} placeholder='Escreva um comentário...' style={{ margin: '0 0 0 0', width: '100%' }} onKeyDown={(e) => sendComment(e)} ></input>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <p style={{ color: '#65676b', margin: '0 10px 0 0' }}>Comentários:</p>
+                            <p style={{ color: '#65676b', margin: '0 10px 0 0' }} onClick={() => ocultComments()}>Fechar</p>
+                        </div>
+                        <RenderComments></RenderComments>
                     </div>
                 </div>
             </div>
@@ -218,20 +351,17 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data }) => {
                 >
                     <Box sx={style}>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            <div style={{ 'display': 'flex', whiteSpace: 'normal' }}>
-                                {name}
-                            </div>
+                            {name}
+
                         </Typography>
                         <Typography id="modal-modal-title" variant="h6" component="h2" style={{ 'display': 'flex', 'justifyContent': 'center' }}>
                             <strong>{post}</strong>
                         </Typography>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            <div style={{ 'display': 'flex', whiteSpace: 'normal' }}>
-                                {arrLikesName.length} Likes:
-                            </div>
-                            <div style={{ 'display': 'flex', whiteSpace: 'normal' }}>
-                                {arrLikesName.toString().replace(/[,]/g, ", ")}
-                            </div>
+                            {arrLikesName.length} Likes:
+                            <br></br>
+                            {arrLikesName.toString().replace(/[,]/g, ", ")}
+
                         </Typography>
                     </Box>
                 </Modal >

@@ -21,12 +21,12 @@ const Feed = () => {
             Authorization: token
         }
     }).then(resp => {
-        respostaFedd = resp.data;
+        respostaFedd = resp.data;        
         if (respostaFedd === "") {
             localStorage.setItem(`viewPosts`, JSON.stringify([]))
             localStorage.setItem(`usersPosts`, JSON.stringify([]))
         } else {
-            localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
+            localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts))
             localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
         }
     }).catch(error => {
@@ -51,7 +51,7 @@ const Feed = () => {
         const fedds = JSON.parse(localStorage.getItem('viewPosts'))
 
         var setViewFedds;
-        if (fedds !== null) {
+        if (fedds !== null) {            
             fedds.sort(compare)
             setViewFedds = fedds
         } else {
@@ -94,6 +94,8 @@ const Feed = () => {
                         post={gallery.post}
                         youlike={youLike}
                         data={gallery.date}
+                        photoUser={gallery.avatar}
+                        comments={gallery.comments}
                     />
                 </div>
             )
@@ -140,7 +142,7 @@ const Feed = () => {
                     }
                 }).then(resp => {
                     respostaFedd = resp.data;
-                    localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
+                    localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts))
                     localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
                 }).catch(error => {
                     respostaFedd = error.toJSON();
@@ -149,8 +151,7 @@ const Feed = () => {
                     } else {
                         alert.show(`Erro ${respostaFedd.status} - ${respostaFedd.message}`);
                     }
-                })
-                //localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts[0]))
+                })                
             }).catch(error => {
                 resposta = error.toJSON();
                 if (resposta.status === 500) {

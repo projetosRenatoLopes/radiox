@@ -25,6 +25,7 @@ const VerifySession = () => {
                 localStorage.setItem(`user`, resposta.user)
                 localStorage.setItem(`userId`, resposta.id)
                 localStorage.setItem(`nickName`, resposta.nickname)
+                localStorage.setItem(`avatar`, resposta.avatar)
             } else {
                 alert.error('Erro ao verificar sessão')
             }
