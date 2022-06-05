@@ -169,7 +169,7 @@ const User = () => {
             alert.show('Erro ao enviar informações!\nFeche a página e abra novamente novamente.')
         } else {
             const imgUserEdit = localStorage.getItem('imgUpload')
-            if (imgUser === null || imgUser === "" || imgUser === undefined) {
+            if (imgUserEdit === null || imgUserEdit === "" || imgUserEdit === undefined) {
                 alert.show('Erro ao carregar a imagem! Tente selecionar o arquivo novamente.')
             } else {
 
