@@ -10,7 +10,8 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 
-const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, comments }) => {
+const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, comments, havemedia, typemedia, media }) => {
+    const mediaField = havemedia;
     const [commentsActualPost, setCommentsActualPost] = useState(comments)
     const avatarUserTemp = localStorage.getItem('avatar')
     var avatarUser = '/img/noavatar.png';
@@ -18,7 +19,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
         avatarUser = avatarUserTemp;
     }
     var strCommentsCount = '0 comentário'
-    if(comments === undefined || comments === null || comments === 'null' || comments === ""){
+    if (comments === undefined || comments === null || comments === 'null' || comments === "") {
         strCommentsCount = `0 comentário`
     } else {
         if (comments.length < 2) {
@@ -27,7 +28,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
             strCommentsCount = `${comments.length} comentários`
         }
     }
-    
+
     if (comments !== commentsActualPost) {
         setCommentsActualPost(comments)
     }
@@ -219,7 +220,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
                         <p style={{ margin: '8px 8px 2px 8px', fontSize: '12px', fontStyle: 'unset' }}>{gallery.name}</p>
                         <p style={{ margin: '0 8px 8px 8px' }}>{gallery.comment}</p>
                     </div>
-                </div>            
+                </div>
             )
         }
 
@@ -287,6 +288,33 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
         }
     }
 
+    const Media = () => {
+        
+        if (havemedia === "false") {
+            return (<></>)
+        } else {
+            if (typemedia === 'video') {
+                return (<>
+                    {/* <h1>VIDEO</h1> */}                    
+                    <iframe
+                        width='100%' height='240px'
+                        src={'media'} title="YouTube video player"
+                        frameBorder="0"
+                        allowFullScreen
+                        sandbox="allow-forms allow-same-origin allow-popups allow-scripts allow-top-navigation"
+                    >
+                    </iframe>
+
+                </>)
+            } else {
+                return (<>
+                    <img alt='img-post' src={media}></img>
+                </>)
+            }
+
+        }
+    }
+
     return (
         <>
             <div className="card" key={uuid}>
@@ -302,9 +330,12 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
                         <p style={{ margin: '5px 0 0 10px', padding: '0', fontSize: '12px', color: '#65676b' }}>{dataPost}</p>
                     </div>
                 </div>
-                <div className="post-body" style={{ margin: '0 6px 0 6px' }}>
-                    <div className="card-text" style={{ 'display': 'flex', 'alignItems': 'center', 'width': '100%' }}>
+                <div className="post-body" style={{ margin: '0 0 0 0', display: 'inline', alignItems: 'center' }}>
+                    <div className="card-text" style={{ 'display': 'flex', 'alignItems': 'center', 'width': '100%', margin: '0 0 5px 0' }}>
                         <div style={{ 'padding': '0 5px 0 5px' }}>{post}</div>
+                    </div>
+                    <div className='card-media' style={{ 'display': 'flex', 'alignItems': 'center', 'width': '100%' }}>
+                        <Media></Media>
                     </div>
                 </div>
                 <div className='bottom-post' style={{ margin: '0 6px 0 6px' }}>
