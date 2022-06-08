@@ -11,8 +11,8 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 
 const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, comments, havemedia, typemedia, media }) => {
-    const mediaField = havemedia;
-    const [commentsActualPost, setCommentsActualPost] = useState(comments)
+    const mediaField = havemedia;    
+    const [commentsActualPost, setCommentsActualPost] = useState([])
     const avatarUserTemp = localStorage.getItem('avatar')
     var avatarUser = '/img/noavatar.png';
     if (avatarUserTemp !== null && avatarUserTemp !== undefined && avatarUserTemp !== 'null') {
@@ -29,13 +29,15 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
         }
     }
 
-    if (comments !== commentsActualPost) {
+    if (JSON.stringify(comments) !== JSON.stringify(commentsActualPost)) {        
         setCommentsActualPost(comments)
     }
     const [avatar, setAvatar] = useState('/img/noavatar.png')
     var youLiked = youlike
     const [open, setOpen] = useState(false);
+    const [openPhoto, setOpenPhoto] = useState(false);
     const handleClose = () => setOpen(false);
+    const handleClosePhoto = () => setOpenPhoto(false);
     const alert = useAlert();
     var arrLikes = [];
     var arrLikesName = [];
@@ -165,6 +167,9 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
     function openModal() {
         setOpen(true)
     }
+    function viewPhoto() {
+        setOpenPhoto(true)
+    }
 
     React.useEffect(() => {
         const interval = setInterval(() => {
@@ -183,7 +188,10 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
             } else {
                 setAvatar('/img/noavatar.png')
             }
-            setCommentsActualPost(comments)
+          
+            if (commentsActualPost !== comments) {                
+                setCommentsActualPost(comments)                
+            }
             youLiked = verYouLike;
         }, 2000);
         return () => clearInterval(interval)
@@ -192,6 +200,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
     function ocultComments() {
         document.getElementById(`commets-post-${uuid}}`).style.display = 'none'
     }
+
     function showComments() {
         const commetsForm = document.getElementById(`commets-post-${uuid}}`).style.display
         if (commetsForm === 'inline') {
@@ -228,7 +237,7 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
             return (<><div style={{ 'display': 'flex', 'justifyContent': 'center', 'width': '100%', color: '#FFFFFF' }}><h5>Nenhum comentário ainda.</h5></div></>)
         } else {
             return (
-                <div className="list-prod" id='list-prod' style={{ 'width': '100%', 'fontSize': '15px' }}>
+                <div className="list-prod" id='list-prod' style={{ 'width': '100%', 'fontSize': '15px', maxHeight: '200px', overflowY: 'scroll' }}>
                     {commentsActualPost.map(renderComments)}
                 </div>
             )
@@ -288,32 +297,26 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
         }
     }
 
-    const Media = () => {
-        
-        if (havemedia === "false") {
-            return (<></>)
+    var displayImg = 'none';
+    var displayVideo = 'none';
+    var displayMedia = 'none'
+    if (havemedia === "false") {
+        displayVideo = 'none'
+        displayImg = 'none'
+        displayMedia = 'none'
+    } else {
+        if (typemedia === 'video') {
+            displayMedia = 'flex'
+            displayVideo = 'flex'
+            displayImg = 'none'
         } else {
-            if (typemedia === 'video') {
-                return (<>
-                    {/* <h1>VIDEO</h1> */}                    
-                    <iframe
-                        width='100%' height='240px'
-                        src={'media'} title="YouTube video player"
-                        frameBorder="0"
-                        allowFullScreen
-                        sandbox="allow-forms allow-same-origin allow-popups allow-scripts allow-top-navigation"
-                    >
-                    </iframe>
-
-                </>)
-            } else {
-                return (<>
-                    <img alt='img-post' src={media}></img>
-                </>)
-            }
-
+            displayMedia = 'flex'
+            displayImg = 'flex'
+            displayVideo = 'none'
         }
     }
+    // const Media = () => {
+    // }
 
     return (
         <>
@@ -334,8 +337,12 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
                     <div className="card-text" style={{ 'display': 'flex', 'alignItems': 'center', 'width': '100%', margin: '0 0 5px 0' }}>
                         <div style={{ 'padding': '0 5px 0 5px' }}>{post}</div>
                     </div>
-                    <div className='card-media' style={{ 'display': 'flex', 'alignItems': 'center', 'width': '100%' }}>
-                        <Media></Media>
+                    <div className='card-media' style={{ display: displayMedia, alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', overflow: 'hidden,', paddingTop: '56.25%' }}>
+                        {/* <Media></Media> */}
+                        <iframe id='video-post' style={{ display: displayVideo, position: 'absolute', top: '0', left: '0', bottom: '0', right: '0', width: '100%', height: '100%' }} src={media} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                            <img onClick={viewPhoto} id='img-post' style={{ display: displayImg, position: 'absolute', top: '0', bottom: '0', height: '100%' }} alt='img-post' src={media}></img>
+                        </div>
                     </div>
                 </div>
                 <div className='bottom-post' style={{ margin: '0 6px 0 6px' }}>
@@ -394,6 +401,23 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
                             <strong>{post}</strong>
                         </Typography>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            {arrLikesName.length} Likes:
+                            <br></br>
+                            {arrLikesName.toString().replace(/[,]/g, ", ")}
+
+                        </Typography>
+                    </Box>
+                </Modal >
+                <Modal
+
+                    open={openPhoto}
+                    onClose={handleClosePhoto}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={style}>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            <img width={'100%'} src={media} alt='img-post' ></img>
                             {arrLikesName.length} Likes:
                             <br></br>
                             {arrLikesName.toString().replace(/[,]/g, ", ")}

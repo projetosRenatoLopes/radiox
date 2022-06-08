@@ -289,6 +289,7 @@ const User = () => {
                     <button type='submit' className="btn-co btn-l btn-g" style={{ 'marginTop': '15px', 'width': '150px' }} onClick={editUser}>Salvar</button>
                 </div>
                 <br></br>
+                
             </div>
         </>
     )

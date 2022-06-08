@@ -49,7 +49,7 @@ const Feed = () => {
 
     function FeedPosts() {
 
-        const fedds = JSON.parse(localStorage.getItem('viewPosts'))
+        var fedds = JSON.parse(localStorage.getItem('viewPosts'))
 
         var setViewFedds;
         if (fedds !== null) {
@@ -64,13 +64,17 @@ const Feed = () => {
         React.useEffect(() => {
             const interval = setInterval(() => {
                 RefreshData()
-                const fedds = JSON.parse(localStorage.getItem('viewPosts'))
-                if (fedds !== null) {
-                    fedds.sort(compare)
+                const feddsActual = JSON.parse(localStorage.getItem('viewPosts'))
+                if (feddsActual !== null) {
+                    feddsActual.sort(compare)
                 }
-
-                setFeed(fedds)
-            }, 112000);
+                if (JSON.stringify(feddsActual) !== JSON.stringify(fedds)) {
+                    console.log(feddsActual)
+                    console.log(fedds)
+                    setFeed(feddsActual)
+                    fedds = feddsActual;
+                }
+            }, 2000);
             return () => clearInterval(interval)
         }, []);
 
@@ -105,23 +109,12 @@ const Feed = () => {
                 </div>
             )
         }
-        function attFeed() {
-            const fedds = JSON.parse(localStorage.getItem('viewPosts'))
-            if (fedds !== null) {
-                fedds.sort(compare)
-            }
-            setFeed(fedds)
-        }
-
 
         if (fedds === null || fedds.length === 0) {
             return (<><div style={{ 'display': 'flex', 'justifyContent': 'center', 'width': '100%', color: '#FFFFFF' }}><h5>Nada para mostrar ainda.</h5></div></>)
         } else {
             return (
                 <div className="list-prod" id='list-prod' style={{ 'width': '100%', 'fontSize': '15px' }}>
-                    <div  id='div-attfeed' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                        <h4 onClick={attFeed} style={{ color: '#FFFFFF' }}>Atualizar feed</h4>
-                    </div>
                     {feed.map(renderCards)}
                 </div>
             )
@@ -129,78 +122,78 @@ const Feed = () => {
     }
 
     async function sendPost() {
-        // document.getElementById('btnSendPost')['disabled'] = true
-        // const textPost = document.getElementById('text-post')['value']
-        // const radioVideo = document.getElementById('video')['checked']
-        // const radioImagem = document.getElementById('imagem')['checked']
-        // var media = '', haveMedia, typemedia = "";
-        // if (radioVideo === false && radioImagem === false) {
-        //     media = '';
-        //     haveMedia = false;
-        // } else if (radioVideo === true) {
-        //     media = document.getElementById('videoFrame')['src'];
-        //     haveMedia = true
-        //     typemedia = 'video'
-        // } else {
-        //     media = localStorage.getItem('imgPostUpload');
-        //     haveMedia = true
-        //     typemedia = 'imagem'
-        // }
+        document.getElementById('btnSendPost')['disabled'] = true
+        const textPost = document.getElementById('text-post')['value']
+        const radioVideo = document.getElementById('video')['checked']
+        const radioImagem = document.getElementById('imagem')['checked']
+        var media = '', haveMedia, typemedia = "";
+        if (radioVideo === false && radioImagem === false) {
+            media = '';
+            haveMedia = false;
+        } else if (radioVideo === true) {
+            media = document.getElementById('videoFrame')['src'];
+            haveMedia = true
+            typemedia = 'video'
+        } else {
+            media = localStorage.getItem('imgPostUpload');
+            haveMedia = true
+            typemedia = 'imagem'
+        }
 
-        // if (haveMedia === true && (media === null || media === '')) {
-        //     alerts.info('Erro ao carregar ' + typemedia)
-        // } else {
-        //     if (textPost.length > 3) {
+        if (haveMedia === true && (media === null || media === '')) {
+            alerts.info('Erro ao carregar ' + typemedia)
+        } else {
+            if (textPost.length > 3) {
 
-        //         const token = localStorage.getItem(`token`)
-        //         const dadosPost = { "post": textPost, "havemedia": haveMedia, "media": media, "typemedia": typemedia }               
-        //         var resposta;
-        //         await api({
-        //             method: 'POST',
-        //             url: `/user/post`,
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //                 Authorization: token
-        //             },
-        //             data: dadosPost
-        //         }).then(resp => {
-        //             document.getElementById('text-post')['value'] = ''
-        //             setMediaSelect('text')
-        //             respostaFedd = resp.data;
-        //             alerts.success('Post enviado.')
-        //             api({
-        //                 method: 'GET',
-        //                 url: `/user/posts`,
-        //                 headers: {
-        //                     'Content-Type': 'application/json',
-        //                     Authorization: token
-        //                 }
-        //             }).then(resp => {
-        //                 respostaFedd = resp.data;
-        //                 localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts))
-        //                 localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
-        //             }).catch(error => {
-        //                 respostaFedd = error.toJSON();
-        //                 if (respostaFedd.status === 500) {
-        //                     alerts.error('Sessão inválida! Faça login novamente.')
-        //                 } else {
-        //                     alerts.show(`Erro ${respostaFedd.status} - ${respostaFedd.message}`);
-        //                 }
-        //             })
-        //         }).catch(error => {
-        //             resposta = error.toJSON();
-        //             if (resposta.status === 500) {
-        //                 alerts.error('Erro interno.')
-        //             } else {
-        //                 alerts.error(`Erro ${resposta.status} - ${resposta.message}`);
-        //             }
-        //         })
+                const token = localStorage.getItem(`token`)
+                const dadosPost = { "post": textPost, "havemedia": haveMedia, "media": media, "typemedia": typemedia }
+                var resposta;
+                await api({
+                    method: 'POST',
+                    url: `/user/post`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: token
+                    },
+                    data: dadosPost
+                }).then(resp => {
+                    document.getElementById('text-post')['value'] = ''
+                    setMediaSelect('text')
+                    respostaFedd = resp.data;
+                    alerts.success('Post enviado.')
+                    api({
+                        method: 'GET',
+                        url: `/user/posts`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: token
+                        }
+                    }).then(resp => {
+                        respostaFedd = resp.data;
+                        localStorage.setItem(`viewPosts`, JSON.stringify(resp.data.posts))
+                        localStorage.setItem(`usersPosts`, JSON.stringify(resp.data.users[0]))
+                    }).catch(error => {
+                        respostaFedd = error.toJSON();
+                        if (respostaFedd.status === 500) {
+                            alerts.error('Sessão inválida! Faça login novamente.')
+                        } else {
+                            alerts.show(`Erro ${respostaFedd.status} - ${respostaFedd.message}`);
+                        }
+                    })
+                }).catch(error => {
+                    resposta = error.toJSON();
+                    if (resposta.status === 500) {
+                        alerts.error('Erro interno.')
+                    } else {
+                        alerts.error(`Erro ${resposta.status} - ${resposta.message}`);
+                    }
+                })
 
-        //     } else {
-        //         alerts.info('Texto muito curto.')
-        //     }
-        // }
-        // document.getElementById('btnSendPost')['disabled'] = false
+            } else {
+                alerts.info('Texto muito curto.')
+            }
+        }
+        document.getElementById('btnSendPost')['disabled'] = false
     }
 
     const [mediaSelect, setMediaSelect] = useState('text')
@@ -262,13 +255,11 @@ const Feed = () => {
             if (extFile === "jpg" || extFile === "jpeg" || extFile === "png") {
                 let reader = new FileReader();
                 let file = event.target.files[0];
-                console.log(event.target.files)
-                localStorage.setItem('imgPostUpload', JSON.stringify(event.target.files))
 
                 reader.readAsDataURL(file);
                 reader.onloadend = () => {
                     setImgView(`${reader.result}`);
-                    //localStorage.setItem('imgPostUpload', `${reader.result}`)
+                    localStorage.setItem('imgPostUpload', `${reader.result}`)
                 };
             } else {
                 localStorage.removeItem('imgPostUpload')
@@ -287,7 +278,7 @@ const Feed = () => {
             </>)
         } else if (mediaSelect === 'video') {
             return (<>
-                <input type='text' id='media' onChange={() => getYouTubeEmbedUrl()} style={{ border: '1px solid #FFFFFF', fontSize: '15px', backgroundColor: '#FFFFFF', width: '100%', margin: '0 0 5px 0' }}></input>
+                <input type='text' id='mediaVideo' onChange={() => getYouTubeEmbedUrl()} style={{ border: '1px solid #FFFFFF', fontSize: '15px', backgroundColor: '#FFFFFF', width: '100%', margin: '0 0 5px 0' }}></input>
                 <div style={{ width: '100%', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
                     <PreviewVideo></PreviewVideo>
                 </div>
@@ -306,15 +297,15 @@ const Feed = () => {
                 <textarea id='text-post' style={{ margin: '10px 0 15px 0', width: '100%', height: '100px', maxWidth: '100%', maxHeight: '150px' }}></textarea>
                 <div style={{ margin: '0 0 5px 0' }}>
                     <div style={{ margin: '0 0 5px 0' }}>
-                        <input type='radio' name='media' onChange={() => setMediaSelect('text')} id='text' defaultChecked></input>
+                        <input type='radio' name='mediaImgVideo' onChange={() => setMediaSelect('text')} id='text' defaultChecked></input>
                         <label htmlFor="text" style={{ color: '#FFFFFF' }}>Sem mídia</label>
                     </div>
                     <div style={{ margin: '0 0 5px 0' }}>
-                        <input type='radio' name='media' onChange={() => setMediaSelect('img')} id='imagem'></input>
+                        <input type='radio' name='mediaImgVideo' onChange={() => setMediaSelect('img')} id='imagem'></input>
                         <label htmlFor="imagem" style={{ color: '#FFFFFF' }}>Imagem</label>
                     </div>
                     <div style={{ margin: '0 0 5px 0' }}>
-                        <input type='radio' name='media' onChange={() => setMediaSelect('video')} id='video'></input>
+                        <input type='radio' name='mediaImgVideo' onChange={() => setMediaSelect('video')} id='video'></input>
                         <label htmlFor="video" style={{ color: '#FFFFFF' }}>Link YouTube</label>
                     </div>
                 </div>
