@@ -19,6 +19,12 @@ body {
     margin-bottom: 10px;
     width: 30%;
 }
+#text-post{
+    box-shadow: 0 0 0 0;
+    outline: 0;
+    font-size: 20px;
+    border: 0;
+}
 
 .title-page {
     font-family: Verdana, sans-serif;

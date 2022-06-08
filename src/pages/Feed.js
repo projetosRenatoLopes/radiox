@@ -5,7 +5,10 @@ import Card from "../components/Card";
 import RefreshData from "../utils/refreshData";
 import { compare } from "../utils/orderById";
 import VerifySession from "../utils/verifySession";
-
+import { BsCardImage } from 'react-icons/bs'
+import { MdVideoLibrary } from 'react-icons/md'
+import { BiImageAdd } from 'react-icons/bi'
+import { GrClose } from 'react-icons/gr'
 
 const Feed = () => {
     localStorage.removeItem('imgPostUpload');
@@ -270,19 +273,27 @@ const Feed = () => {
         }
 
         if (mediaSelect === 'img') {
-            return (<>
-                <input type='file' id='mediaImg' accept="image/jpg, image/jpeg, image/png" onChange={(e) => validateFileType(e)} style={{ border: '1px solid #FFFFFF', fontSize: '20px', backgroundColor: '#FFFFFF', width: '100%', margin: '0 0 5px 0' }}></input>
-                <div style={{ width: '100%', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
-                    <img alt='img-preview' src={imgView} style={{ maxWidth: '70%', maxHeight: '250px' }} />
+            return (<div >
+                <div style={{width:'100%',display:'flex',justifyContent:'flex-end'}}>
+                    <label htmlFor="text" style={{ margin: '0 10px 0 0', color: '#202020', fontSize: '30px' }}><GrClose></GrClose></label>
                 </div>
-            </>)
+                <input hidden type='file' id='mediaImg' accept="image/jpg, image/jpeg, image/png" onChange={(e) => validateFileType(e)} style={{ border: '1px solid #FFFFFF', fontSize: '15px', backgroundColor: '#FFFFFF', width: '90%', margin: '0 0 5px 0' }}></input>
+                <label htmlFor="mediaImg">
+                    <div style={{ width: '100%', alignItems: 'center', justifyContent: 'center', display: 'flex', margin: '10px 0 0 0' }}>                        
+                            <img alt='img-preview' src={imgView} style={{ maxWidth: '100%', maxHeight: '250px' }} />                        
+                    </div>
+                </label>
+            </div>)
         } else if (mediaSelect === 'video') {
-            return (<>
-                <input type='text' id='mediaVideo' onChange={() => getYouTubeEmbedUrl()} style={{ border: '1px solid #FFFFFF', fontSize: '15px', backgroundColor: '#FFFFFF', width: '100%', margin: '0 0 5px 0' }}></input>
-                <div style={{ width: '100%', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
+            return (<div style={{display:'flex',justifyContent:'center',flexDirection:'column',alignItems:'center'}}>
+               <div style={{width:'100%',display:'flex',justifyContent:'flex-end'}}>
+                    <label htmlFor="text" style={{ margin: '0 10px 0 0', color: '#202020', fontSize: '30px' }}><GrClose></GrClose></label>
+                </div>
+                <input type='text' id='mediaVideo' placeholder="Cole aqui o link do vídeo..." onChange={() => getYouTubeEmbedUrl()} style={{ border: '1px solid #202020', fontSize: '15px', backgroundColor: '#FFFFFF', width: '90%', margin: '0 0 5px 0' }}></input>
+                <div style={{display:'flex',justifyContent:'center',flexDirection:'column',alignItems:'center'}}>
                     <PreviewVideo></PreviewVideo>
                 </div>
-            </>)
+            </div>)
         } else {
             return (<></>)
         }
@@ -293,25 +304,22 @@ const Feed = () => {
             <div className='logo-page'>
                 <h3>Feed</h3>
             </div>
-            <div >
-                <textarea id='text-post' style={{ margin: '10px 0 15px 0', width: '100%', height: '100px', maxWidth: '100%', maxHeight: '150px' }}></textarea>
-                <div style={{ margin: '0 0 5px 0' }}>
-                    <div style={{ margin: '0 0 5px 0' }}>
-                        <input type='radio' name='mediaImgVideo' onChange={() => setMediaSelect('text')} id='text' defaultChecked></input>
-                        <label htmlFor="text" style={{ color: '#FFFFFF' }}>Sem mídia</label>
+            <div className="post-area" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: 'auto', background: 'rgba(255,255,255,0.1', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+                <div style={{  display: 'flex', flexDirection: 'column', alignItems: 'center',margin: '10px 0 10px 0', width: '90%', backgroundColor: '#FFFFFF' }}>
+                    <textarea placeholder="Criar publicação..." id='text-post' style={{resize:'vertical',padding: '10px 0 10px 0', margin: '0 0 0 0', width: '95%', height: '100px', maxWidth: '95%', minWidth: '95%', maxHeight: '150px', minHeight: '20px' }}></textarea>
+                    <div style={{ margin: '0 0 0 0', width: '100%', backgroundColor: '#FFFFFF',marginTop:'2px solid #202020' }}>
+                        <div style={{ margin: '10px 0 10px 0' }}>
+                            <input type='radio' name='mediaImgVideo' onChange={() => setMediaSelect('img')} id='imagem' hidden></input>
+                            <label htmlFor="imagem" style={{ margin: '0 10px 0 10px', color: '#202020', fontSize: '30px' }}><BsCardImage /></label>
+                            <input type='radio' name='mediaImgVideo' onChange={() => setMediaSelect('video')} id='video' hidden></input>
+                            <label htmlFor="video" style={{ margin: '0 12px 0 0', color: '#202020', fontSize: '30px' }}><MdVideoLibrary /></label>
+                            <input type='radio' name='mediaImgVideo' onChange={() => setMediaSelect('text')} id='text' defaultChecked hidden></input>
+                        </div>
                     </div>
-                    <div style={{ margin: '0 0 5px 0' }}>
-                        <input type='radio' name='mediaImgVideo' onChange={() => setMediaSelect('img')} id='imagem'></input>
-                        <label htmlFor="imagem" style={{ color: '#FFFFFF' }}>Imagem</label>
+                    <AreaMedia></AreaMedia>
+                    <div style={{ width: '90%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', margin: '10px 0 10px 0' }}>
+                        <button className='btn-bar btn-g btn-l' id='btnSendPost' onClick={sendPost}>Postar</button>
                     </div>
-                    <div style={{ margin: '0 0 5px 0' }}>
-                        <input type='radio' name='mediaImgVideo' onChange={() => setMediaSelect('video')} id='video'></input>
-                        <label htmlFor="video" style={{ color: '#FFFFFF' }}>Link YouTube</label>
-                    </div>
-                </div>
-                <AreaMedia></AreaMedia>
-                <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', margin: '10px 0 0 0' }}>
-                    <button className='btn-bar btn-g btn-l' id='btnSendPost' onClick={sendPost}>Postar</button>
                 </div>
             </div>
             <br></br>

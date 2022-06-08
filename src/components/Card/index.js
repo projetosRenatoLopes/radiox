@@ -335,9 +335,9 @@ const Card = ({ uuid, userPost, likes, post, name, youlike, data, photoUser, com
                 </div>
                 <div className="post-body" style={{ margin: '0 0 0 0', display: 'inline', alignItems: 'center' }}>
                     <div className="card-text" style={{ 'display': 'flex', 'alignItems': 'center', 'width': '100%', margin: '0 0 5px 0' }}>
-                        <div style={{ 'padding': '0 5px 0 5px' }}>{post}</div>
+                        <div style={{ padding: '0 5px 0 5px', whiteSpace:'break-spaces', width:'100%', maxHeight:'400px', overflowY: 'auto' }}>{post}</div>
                     </div>
-                    <div className='card-media' style={{ display: displayMedia, alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', overflow: 'hidden,', paddingTop: '56.25%' }}>
+                    <div className='card-media' style={{ display: displayMedia, alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', overflow: 'hidden', paddingTop: '56.25%' }}>
                         {/* <Media></Media> */}
                         <iframe id='video-post' style={{ display: displayVideo, position: 'absolute', top: '0', left: '0', bottom: '0', right: '0', width: '100%', height: '100%' }} src={media} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
